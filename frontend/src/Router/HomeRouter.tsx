@@ -3,11 +3,12 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Calendar from "../Calendar/Calendar.tsx";
+import Lending from "../Lending/Lending.tsx";
 
 const HomeRouter = createBrowserRouter([
   {
     path: "/",
-    element: <>home page</>,
+    element: <Lending />,
   },
   {
     path: "/calendar",

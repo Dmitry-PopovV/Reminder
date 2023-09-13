@@ -1,5 +1,5 @@
 //import style from './App.module.css';
-import HomeRouterProvider from "./Routers/HomeRouter";
+import HomeRouterProvider from "./Router/HomeRouter";
 
 function App() {
   return (

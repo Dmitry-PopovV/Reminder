@@ -1,10 +1,11 @@
 //import style from './App.module.css';
-import HomeRouterProvider from "./Router/HomeRouter";
+import routerPaths from "./routerPaths";
+import { RouterProvider } from "react-router-dom";
 
 function App() {
   return (
-    <HomeRouterProvider />
+    <RouterProvider router={routerPaths} />
   )
 }
 
-export default App
+export default App;

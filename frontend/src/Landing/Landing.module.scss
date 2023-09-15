@@ -1,0 +1,23 @@
+$BorSty: solid;
+$BorWid: 1px;
+$mar1: 25%;
+$mar2: auto;
+
+.container {
+    text-align: center;
+    margin: $mar2 $mar1;
+    border-style: $BorSty;
+    border-width: $BorWid;
+    border-radius: 10px;
+    overflow: hidden;
+    position: absolute;
+    top: 40%;
+    width: 50%;
+}
+
+.header {
+    background-color: lightblue;
+    border-bottom-style: $BorSty;
+    border-bottom-width: $BorWid;
+    
+}

@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import Calendar from "./Calendar/Calendar.tsx";
+import Layout from "./Layout/Layout.tsx";
 import Lending from "./Landing/Landing.tsx";
 
 const routerPaths = createBrowserRouter([
@@ -9,7 +9,7 @@ const routerPaths = createBrowserRouter([
   },
   {
     path: "/calendar",
-    element: <Calendar />,
+    element: <Layout />,
     children: [
       {
         path: "/calendar/",

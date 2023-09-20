@@ -1,10 +1,11 @@
-//import style from './App.module.css';
-import HomeRouterProvider from "./Routers/HomeRouter";
+import routerPaths from "./routerPaths";
+import { RouterProvider } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
-    <HomeRouterProvider />
+    <RouterProvider router={routerPaths} />
   )
 }
 
-export default App
+export default App;

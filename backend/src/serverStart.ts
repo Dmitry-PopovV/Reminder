@@ -1,5 +1,10 @@
-import {AppDataSource} from "./data-source";
+import { AppDataSource } from "./data-source";
 
 export default async function serverStart() {
-    await AppDataSource.initialize();
+    try {
+        await AppDataSource.initialize();
+    } catch (err) {
+        console.log("Server start error:\n", (err as Error).message);
+        throw err;
+    }
 }

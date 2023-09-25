@@ -6,13 +6,13 @@ config({ path: 'src/env/.env' });
 export const AppDataSource = new DataSource({
     type: "postgres",
     host: "localhost",
-    port: Number(process.env.port),
-    username: process.env.User_Name,
-    password: process.env.password,
-    database: process.env.database,
+    port: Number(process.env.PORT),
+    username: process.env.USER_NAME,
+    password: process.env.PASWORD,
+    database: process.env.DATABASE,
     synchronize: true,
     logging: true,
     entities: [User],
     subscribers: [],
     migrations: [],
-})
+});

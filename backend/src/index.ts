@@ -12,8 +12,7 @@ async function main() {
     await serverStart();
 
     app
-      .get('/', (req, res, next) => {
-        throw new Error("AAA");
+      .get('/', (req, res) => {
         res.send('Hello World!');
       })
       .use(ErrorMidleware);

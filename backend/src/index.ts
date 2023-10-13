@@ -2,8 +2,7 @@ import "reflect-metadata";
 import express from 'express';
 import serverStart from "./serverStart";
 import ErrorMidleware from "./midleware/ErrorMidleware";
-import ApiRouter from "./routers/ApiRouter";
-import { SetHeadersMidleware } from "./midleware/SetHeadersMidleware";
+import Routers from "./routers/Routers";
 
 
 const app = express();
@@ -14,12 +13,11 @@ async function main() {
     await serverStart();
 
     app
-      .use(SetHeadersMidleware)
       .use(express.json())
       .get('/', (req, res) => {
         res.send('Hello World!');
       })
-      .use("/api", ApiRouter)
+      .use("/api", Routers)
       .use(ErrorMidleware);
     app
       .listen(port, () => {

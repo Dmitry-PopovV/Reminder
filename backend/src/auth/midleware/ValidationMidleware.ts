@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { validateOrReject } from 'class-validator';
 
-export function ValidationMidleware(dto: any) {
+export function ValidationMidleware(dto: new () => any) {
     return async (req: Request, res: Response, next: Function) => {
         try {
             const newDto = new dto;

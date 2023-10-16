@@ -1,11 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout/Layout.tsx";
-import Lending from "./Landing/Landing.tsx";
+import Landing from "./Landing/Landing.tsx";
 
 const routerPaths = createBrowserRouter([
   {
     path: "/",
-    element: <Lending />,
+    element: <Landing />,
   },
   {
     path: "/calendar",

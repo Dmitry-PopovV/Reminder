@@ -1,12 +1,11 @@
-import style from "./Landing.module.scss"
+import style from "./Landing.module.scss";
+import GoogleBtn from "../GoogleBtn/GoogleBtn";
 
-export default function Lending() {
-    return (
-      <div className={style.container}>
-        <div className={style.header}>Reminder</div>
-        <div>
-          Login with Google to start
-        </div>
-      </div>
-    );
-  }
+export default function Landing() {
+  return (
+    <div className={style.container}>
+      <div className={style.header}>Reminder</div>
+      <GoogleBtn />
+    </div>
+  );
+}

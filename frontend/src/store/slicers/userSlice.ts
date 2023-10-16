@@ -1,13 +1,13 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type User = {
     email: string,
     fullName: string
-};
+}
 
 export type InitialState = {
     user: User | null
-};
+}
 const initialState: InitialState = {
     user: null
 };

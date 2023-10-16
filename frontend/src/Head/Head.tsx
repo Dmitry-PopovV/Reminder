@@ -2,13 +2,12 @@ import style from "./Head.module.scss";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { useAppSelector } from "../store" ;
 
 
 export default function Head() {
 
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useAppSelector()//useSelector((state: RootState) => state.user.user);
 
   return (
     <div className={style.container}>

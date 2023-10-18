@@ -1,15 +1,16 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout/Layout.tsx";
 import Landing from "./Landing/Landing.tsx";
+import Authentication from "./Authentication/Authentication";
 
 const routerPaths = createBrowserRouter([
   {
     path: "/",
-    element: <Landing />,
+    element: <Authentication><Landing /></Authentication>,
   },
   {
     path: "/calendar",
-    element: <Layout />,
+    element: <Authentication><Layout /></Authentication>,
     children: [
       {
         path: "/calendar/",

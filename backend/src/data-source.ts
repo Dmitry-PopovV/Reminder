@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { User } from "./entity/User";
 import { config } from "dotenv";
+
 config({ path: 'src/env/.env' });
 
 export const AppDataSource = new DataSource({

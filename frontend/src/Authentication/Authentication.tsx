@@ -1,39 +1,27 @@
 import style from "./Authentication.module.scss"
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useDispatch } from 'react-redux';
+import { ReactNode } from 'react';
+import { Navigate } from 'react-router';
+import { useUser } from "../hooks/useUser";
 import Spinner from 'react-bootstrap/Spinner';
-import axios from 'axios';
-import { useAppSelector } from "../store";
-import { setUser } from "../store/slicers/userSlice";
 
-export default function Authentication({ children }: { children: JSX.Element }) {
-  const [status, setStatus] = useState("Loading" as "OK" | "Loading");
-  const user = useAppSelector();
+
+export default function Authentication({ children }: { children: ReactNode | ReactNode[] }) {
   const location = document.location.pathname;
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { user, isLoading } = useUser();
+  let navigating = { isUsing: false, to: "" };
 
-  useEffect(() => {
+  if (!isLoading) {
     if ((location === "/") && (user)) {
-      navigate("/calendar");
-    } else if (!user) {
-      axios.get("/api/user")
-        .then((res) => {
-          dispatch(setUser(res.data));
-          setStatus("OK");
-        })
-        .catch(() => {
-          if (location !== "/") {
-            navigate("/");
-          }
-        });
-    } else {
-      setStatus("OK");
+      navigating = { isUsing: true, to: "/calendar" };
     }
-  }, [user]);
+    if ((location !== "/") && (!user)) {
+      navigating = { isUsing: true, to: "/" };
+    }
+  }
 
-  if ((location === "/") || (status === "OK")) {
+  if (navigating.isUsing) {
+    return (<Navigate to={navigating.to} />);
+  } else if (!isLoading) {
     return (
       <>
         {children}

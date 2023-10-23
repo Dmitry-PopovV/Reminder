@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { AuthRouter } from "../auth/AuthRouter";
-import { AuthenticationMidleware } from "../auth/midleware/AuthenticationMidleware";
-import { GetInfoRouter } from "../getInfo/GetInfoRouter";
+import { AuthorizationMidleware } from "../midleware/AuthorizationMidleware";
+import { UserRouter } from "../user/UserRouter";
 
 const Routers = Router();
 
 Routers
   .use("/", AuthRouter)
-  .use("/", AuthenticationMidleware)
-  .use("/", GetInfoRouter);
+  .use("/", AuthorizationMidleware)
+  .use("/", UserRouter);
 
 export default Routers;

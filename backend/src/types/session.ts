@@ -5,6 +5,6 @@ declare module "express-session" {
         user: {
             email: string;
             fullName: string;
-        };
+        } | null;
     }
 }

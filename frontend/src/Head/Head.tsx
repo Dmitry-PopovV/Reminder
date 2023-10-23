@@ -9,8 +9,8 @@ import { useUser } from "../hooks/useUser";
 export default function Head() {
   const {user, setUser} = useUser();
 
-  function logOut(){
-    axios.get("api/logOut")
+  function logout(){
+    axios.put("api/logout")
       .then(()=>{
         setUser(null);
       })
@@ -25,7 +25,7 @@ export default function Head() {
         <Col></Col>
         <Col xs="auto" md="auto">
           <span id="user_name">{user?.email}</span>
-          <Button variant="light" className={style.unlog_button} onClick={logOut}>logOut</Button>
+          <Button variant="light" className={style.logout_button} onClick={logout}>logout</Button>
         </Col>
       </Row>
     </div>

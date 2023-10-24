@@ -1,19 +1,23 @@
 import "reflect-metadata";
+import "./types/session";
 import express from 'express';
-import serverStart from "./serverStart";
+import session from 'express-session';
+import serverInitialize from "./serverInitialize";
 import ErrorMidleware from "./midleware/ErrorMidleware";
 import Routers from "./routers/Routers";
 
 
 const app = express();
 const port = 3000;
+const cookieTime = 24 * 60 * 60 * 1000;
 
 async function main() {
   try {
-    await serverStart();
+    const { cookieSecret } = await serverInitialize();
 
     app
       .use(express.json())
+      .use(session({ secret: cookieSecret, cookie: { maxAge: cookieTime,  httpOnly: true}, resave: false, saveUninitialized: true }))
       .get('/', (req, res) => {
         res.send('Hello World!');
       })

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { validateOrReject } from 'class-validator';
+import { validateOrReject, ValidationError } from 'class-validator';
 
 export function ValidationMidleware(dto: new () => any) {
     return async (req: Request, res: Response, next: Function) => {
@@ -12,7 +12,8 @@ export function ValidationMidleware(dto: new () => any) {
             await validateOrReject(newDto);
             next();
         } catch(errors: any) {
-            next(new Error("ValidationError: " + errors[0].property + " = " + errors[0].value));
+            const errs = (errors as ValidationError[]);
+            next(new Error("ValidationError: " + errs[0].property + " = " + errs[0].value));
         }
     }
 }

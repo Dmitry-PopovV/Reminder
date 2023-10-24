@@ -2,12 +2,19 @@ import style from "./Head.module.scss";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { useAppSelector } from "../store" ;
+import axios from 'axios';
+import { useUser } from "../hooks/useUser";
 
 
 export default function Head() {
+  const {user, setUser} = useUser();
 
-  const user = useAppSelector()//useSelector((state: RootState) => state.user.user);
+  function logout(){
+    axios.put("api/logout")
+      .then(()=>{
+        setUser(null);
+      })
+  }
 
   return (
     <div className={style.container}>
@@ -17,8 +24,8 @@ export default function Head() {
         </Col>
         <Col></Col>
         <Col xs="auto" md="auto">
-          <span id="user_name">{user ? user.email : "???"}</span>
-          <Button variant="light" className={style.unlog_button}>Unlog</Button>
+          <span id="user_name">{user?.email}</span>
+          <Button variant="light" className={style.logout_button} onClick={logout}>logout</Button>
         </Col>
       </Row>
     </div>

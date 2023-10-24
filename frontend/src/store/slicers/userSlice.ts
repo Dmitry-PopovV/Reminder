@@ -6,17 +6,17 @@ export type User = {
 }
 
 export type InitialState = {
-    user: User | null
+    user: User | null | undefined
 }
 const initialState: InitialState = {
-    user: null
+    user: undefined
 };
 
 export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<User>) => {
+        setUser: (state, action: PayloadAction<User | null>) => {
             state.user = action.payload;
         }
     }

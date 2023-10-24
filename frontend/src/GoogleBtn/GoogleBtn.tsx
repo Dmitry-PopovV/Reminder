@@ -3,14 +3,11 @@ import { useGoogleLogin } from '@react-oauth/google';
 import Spinner from 'react-bootstrap/Spinner';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
-import { setUser } from "../store/slicers/userSlice";
+import { useUser } from "../hooks/useUser";
 
 export default function GoogleBtn() {
-    const [status, setStatus] = useState("OK" as "OK" | "Loading");
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const [status, setStatus] = useState<"OK" | "Loading">("OK");
+    const { setUser } = useUser();
 
     useEffect(() => {
         const params: any = {};
@@ -25,8 +22,7 @@ export default function GoogleBtn() {
 
             axios.post('/api/registration', params)
                 .then((res) => {
-                    dispatch(setUser(res.data));
-                    navigate("/calendar");
+                    setUser(res.data);
                 })
                 .catch((error) => {
                     console.log(error)

@@ -1,19 +1,19 @@
 import style from "./Authentication.module.scss"
-import { ReactNode } from 'react';
-import { Navigate } from 'react-router';
+import { Navigate, useLocation } from 'react-router';
+import { Outlet } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 import Spinner from 'react-bootstrap/Spinner';
 
 
-export default function Authentication({ children }: { children: ReactNode | ReactNode[] }) {
-  const location = document.location.pathname;
+export default function Authentication() {
+  const location = useLocation()
   const { user } = useUser();
 
   if (user !== undefined) {
-    if ((location === "/") && (user)) {
+    if ((location.pathname === "/") && (user)) {
       return (<Navigate to={"/calendar"} />);
     }
-    if ((location !== "/") && (!user)) {
+    if ((location.pathname !== "/") && (!user)) {
       return (<Navigate to={"/"} />);
     }
   }
@@ -24,7 +24,7 @@ export default function Authentication({ children }: { children: ReactNode | Rea
     </div>
   ) : (
     <>
-      {children}
+      <Outlet />
     </>
   );
 }

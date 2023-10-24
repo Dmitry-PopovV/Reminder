@@ -6,22 +6,28 @@ import Authentication from "./Authentication/Authentication";
 const routerPaths = createBrowserRouter([
   {
     path: "/",
-    element: <Authentication><Landing /></Authentication>,
-  },
-  {
-    path: "/calendar",
-    element: <Authentication><Layout /></Authentication>,
+    element: <Authentication />,
     children: [
       {
-        path: "/calendar/",
-        element: <div>list</div>,
+        path: "/",
+        element: <Landing />,
       },
       {
-        path: "/calendar/redactor",
-        element: <div>redactor</div>,
+        path: "/calendar",
+        element: <Layout />,
+        children: [
+          {
+            path: "/calendar/",
+            element: <div>list</div>,
+          },
+          {
+            path: "/calendar/redactor",
+            element: <div>redactor</div>,
+          }
+        ],
       }
-    ],
-  }
+    ]
+  },
 ]);
 
 export default routerPaths

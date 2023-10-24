@@ -6,10 +6,10 @@ export type User = {
 }
 
 export type InitialState = {
-    user: User | null
+    user: User | null | undefined
 }
 const initialState: InitialState = {
-    user: null
+    user: undefined
 };
 
 export const userSlice = createSlice({

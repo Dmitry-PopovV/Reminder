@@ -7,9 +7,9 @@ import Spinner from 'react-bootstrap/Spinner';
 
 export default function Authentication({ children }: { children: ReactNode | ReactNode[] }) {
   const location = document.location.pathname;
-  const { user, isLoading } = useUser();
+  const { user } = useUser();
 
-  if (!isLoading) {
+  if (user !== undefined) {
     if ((location === "/") && (user)) {
       return (<Navigate to={"/calendar"} />);
     }
@@ -18,7 +18,7 @@ export default function Authentication({ children }: { children: ReactNode | Rea
     }
   }
 
-  return isLoading ? (
+  return (user === undefined) ? (
     <div className={style.div}>
       <Spinner animation="border" />
     </div>

@@ -1,36 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import axios from 'axios';
-import { useAppSelector } from "../store";
+import { useAppSelector, useAppDispatch } from "../store";
 import { User, setUser as setStoreUser } from "../store/slicers/userSlice"
 
 export function useUser() {
-  const [isLoading, setIsLoading] = useState(true);
-  const isInProcess = useRef(false);
-  const user = useAppSelector();
-  const dispatch = useDispatch();
-
+  const user = useAppSelector((state) => state.user.user);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if ((!isInProcess.current) && (!user)) {
-      isInProcess.current = true;
+    if (user === undefined) {
       axios.get("/api/user")
         .then((res) => {
           setUser(res.data)
         })
-        .catch(() => { })
-        .finally(() => {
-          if (isLoading) {
-            setIsLoading(false);
-          }
-          isInProcess.current = false;
+        .catch(() => {
+          setUser(null);
         });
     }
-  }, [user])
+  }, [])
 
   function setUser(user: User | null) {
     dispatch(setStoreUser(user));
   }
 
-  return { user, isLoading: isLoading, setUser };
+  return { user, setUser };
 }

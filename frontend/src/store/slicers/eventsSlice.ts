@@ -22,9 +22,9 @@ function cutDay(date: string) {
     return `${splitedDate[0]}-${splitedDate[1]}`;
 }
 
-function safePush(obj: MonthEvents, key: string, item: Event) {
-    if (!obj[key]) obj[key] = [];
-    obj[key].push(item);
+function safePush(monthEvents: MonthEvents, month: string, event: Event) {
+    if (!monthEvents[month]) monthEvents[month] = [];
+    monthEvents[month].push(event);
 }
 
 function eventsListToMonthEvents(eventsList: Event[] | null) {
@@ -41,20 +41,19 @@ export const eventSlice = createSlice({
         setEvents: (state, action: PayloadAction<Event[] | null>) => {
             state.events = eventsListToMonthEvents(action.payload);
         },
-        addEvent: (state, action: PayloadAction<Event>) => {
+        addEvents: (state, action: PayloadAction<Event[]>) => {
             if (!state.events) throw new Error("'events' is not initialaized");
 
-            safePush(state.events, cutDay(action.payload.start), action.payload);
+            action.payload.forEach((val)=>{ safePush(state.events!, cutDay(val.start), val); })
         },
-        deleteEventById: (state, action: PayloadAction<string>) => {
+        deleteEventById: (state, action: PayloadAction<{month: string, id: string}>) => {
             if (!state.events) throw new Error("'events' is not initialaized");
 
-            const eventsList = Object.values(state.events).flat();
-            const elIndex = eventsList.findIndex((el: Event) => el.id === action.payload);
-            state.events = eventsListToMonthEvents(eventsList.splice(elIndex, 0));
+            const elIndex = state.events[action.payload.month].findIndex((el: Event) => el.id === action.payload.id);
+            state.events[action.payload.month].splice(elIndex, 0);
         }
     }
 });
 
-export const { setEvents, addEvent, deleteEventById } = eventSlice.actions;
+export const { setEvents, addEvents, deleteEventById } = eventSlice.actions;
 export default eventSlice.reducer;

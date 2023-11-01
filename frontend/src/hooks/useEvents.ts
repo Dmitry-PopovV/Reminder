@@ -22,10 +22,6 @@ function getInitialMonths() {
 export function useEvents() {
     const events = useAppSelector((state) => state.events.events);
     const dispatch = useAppDispatch();
-    let loadedMonths: string[] = [];
-    if(events) {
-        loadedMonths = Object.keys(events);
-    }
 
     useEffect(() => {
         if (!events) {

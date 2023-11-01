@@ -19,12 +19,12 @@ export default function Calendar() {
             return `${date.getFullYear()}-${date.getMonth()}`;
         }
 
-        let notLoadetMonths = [];
-        if(!events[toMonthString(currentMonth)]) notLoadetMonths.push(currentMonth);
-        if(!events[toMonthString(prevMonth)]) notLoadetMonths.push(prevMonth);
-        if(!events[toMonthString(nextMonth)]) notLoadetMonths.push(nextMonth);
+        let notLoadedMonths = [];
+        if(!events[toMonthString(currentMonth)]) notLoadedMonths.push(currentMonth);
+        if(!events[toMonthString(prevMonth)]) notLoadedMonths.push(prevMonth);
+        if(!events[toMonthString(nextMonth)]) notLoadedMonths.push(nextMonth);
 
-        newMonths(notLoadetMonths);
+        newMonths(notLoadedMonths);
     }
 
     return events ? (

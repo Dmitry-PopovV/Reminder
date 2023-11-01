@@ -18,7 +18,7 @@ export default function Head() {
 
   return (
     <div className={style.container}>
-      <Row>
+      <Row className="m-0">
         <Col xs="auto" md="auto">
           Reminder
         </Col>

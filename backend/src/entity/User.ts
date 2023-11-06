@@ -1,4 +1,5 @@
-import { Entity, BaseEntity, Column, PrimaryColumn } from "typeorm"
+import { Entity, BaseEntity, Column, PrimaryColumn, OneToMany } from "typeorm";
+import { Events } from "./Events";
 
 @Entity()
 export class User extends BaseEntity {
@@ -7,6 +8,9 @@ export class User extends BaseEntity {
 
     @Column()
     fullName: string
+
+    @OneToMany(()=> Events, (events)=>events.email)
+    events: Events[]
 
     static insertIfNotExist(user: User) {
         return this.createQueryBuilder()

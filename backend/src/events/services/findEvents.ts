@@ -6,13 +6,13 @@ type returnedEvents = {
         title: string
         message: string
         start: string
-        hour: string
+        time: string
     }[],
     repetitiveEvents: {
         id: string
         title: string
         message: string
-        hourPeriodicity: string
+        time: string
         dayPeriodicity: string
         weekPeriodicity: string
         monthPeriodicity: string
@@ -26,23 +26,22 @@ export async function findEvents(months: string[]) {
     const events = await Events
         .createQueryBuilder("events")
         .where(
-            `events.sendingDate BETWEEN :searchStart AND :searchEnd 
+            `events.eventDate BETWEEN :searchStart AND :searchEnd 
             OR events.monthPeriodicity = '*' 
             OR CAST(events.monthPeriodicity AS double precision) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP))`
             , { searchStart, searchEnd })
         .getMany();
     let res: returnedEvents = { oneTimeEvents: [], repetitiveEvents: [] };
     events.forEach((val) => {
-        if (val.sendingDate) {
-            const [start, time] = val.sendingDate.toISOString().split('T');
-            const hour = time.split(':')[0];
+        if (val.eventDate) {
+            const [start, time] = val.eventDate.toISOString().split('T');
             res.oneTimeEvents.push(
                 {
                     id: val.id,
                     title: val.title,
                     message: val.message,
                     start,
-                    hour
+                    time
                 }
             );
         } else {
@@ -51,7 +50,7 @@ export async function findEvents(months: string[]) {
                     id: val.id,
                     title: val.title,
                     message: val.message,
-                    hourPeriodicity: val.hourPeriodicity,
+                    time: val.time,
                     dayPeriodicity: val.dayPeriodicity,
                     weekPeriodicity: val.weekPeriodicity,
                     monthPeriodicity: val.monthPeriodicity,

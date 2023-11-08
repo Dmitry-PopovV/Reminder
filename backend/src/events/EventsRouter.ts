@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { ValidationMidleware } from "../midleware/ValidationMidleware";
-import { sendEventsParams } from "./dto/sendEventsParams";
-import { sendEventsController } from "./controllers/sendEventsController";
+import { getEventsDto } from "./dto/getEventsDto";
+import { getEventsController } from "./controllers/getEventsController";
 
 export const EventsRouter = Router();
 
 EventsRouter
-    .post("/events", [ValidationMidleware(sendEventsParams), sendEventsController])
+    .get("/events", [ValidationMidleware("query", getEventsDto), getEventsController])

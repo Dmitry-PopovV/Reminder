@@ -4,12 +4,12 @@ import addMonths from 'date-fns/addMonths';
 import subMonths from 'date-fns/subMonths';
 import set from 'date-fns/set';
 import { useAppSelector, useAppDispatch } from "../store";
-import { oneTimeEvent, repetitiveEvent, setEvents, addOneTimeEvents, deleteOneTimeEventById, addRepetitiveEvents, deleteRepetitiveEventById } from "../store/slicers/eventsSlice"
+import { OneTimeEvent, RepetitiveEvent, setEvents, addOneTimeEvents, deleteOneTimeEvent, addRepetitiveEvents, deleteRepetitiveEvent } from "../store/slicers/eventsSlice"
 
 function getInitialMonths() {
     const currentMonth = new Date();
-    const previosMonth = set(subMonths(currentMonth, 1), {milliseconds: 0, seconds: 0, minutes: 0, hours: 0, date: 0});
-    const nextMonth = set(addMonths(currentMonth, 2), {milliseconds: 0, seconds: 0, minutes: 0, hours: 0, date: 0});
+    const previosMonth = set(subMonths(currentMonth, 1), { milliseconds: 0, seconds: 0, minutes: 0, hours: 0, date: 0 });
+    const nextMonth = set(addMonths(currentMonth, 2), { milliseconds: 0, seconds: 0, minutes: 0, hours: 0, date: 0 });
 
     return [
         previosMonth,
@@ -17,9 +17,9 @@ function getInitialMonths() {
     ];
 }
 
-type postRes = {
-    oneTimeEvents: oneTimeEvent[]
-    repetitiveEvents: repetitiveEvent[]
+type GetRes = {
+    oneTimeEvents: OneTimeEvent[]
+    repetitiveEvents: RepetitiveEvent[]
 }
 
 export function useEvents() {
@@ -28,36 +28,36 @@ export function useEvents() {
 
     useEffect(() => {
         if (!events) {
-            axios.post<postRes>("/api/events", {months: getInitialMonths()})
+            axios.get<GetRes>("/api/events", { params: { months: getInitialMonths() } })
                 .then((res) => {
                     dispatch(setEvents(res.data));
                 });
         }
     }, [])
 
-    function newEvent(event: oneTimeEvent | repetitiveEvent) {
-        if(!(event as oneTimeEvent).start) {
-            dispatch(addOneTimeEvents([event as oneTimeEvent]));
+    function newEvent(event: OneTimeEvent | RepetitiveEvent) {
+        if (!(event as OneTimeEvent).start) {
+            dispatch(addOneTimeEvents([event as OneTimeEvent]));
         } else {
-            dispatch(addRepetitiveEvents([event as repetitiveEvent]));
+            dispatch(addRepetitiveEvents([event as RepetitiveEvent]));
         }
     }
 
-    function deleteEvent(params: {month?: string, id: string}) {
-        if(params.month) {
-            dispatch(deleteOneTimeEventById(params as {month: string, id: string} ));
+    function deleteEvent(id: string, month?: string) {
+        if (month) {
+            dispatch(deleteOneTimeEvent({ month, id }));
         } else {
-            dispatch(deleteRepetitiveEventById(params.month as string));
+            dispatch(deleteRepetitiveEvent(id));
         }
-        
+
     }
 
     function newMonths(months: Date[]) {
-        axios.post<postRes>("/api/events", {months})
-                .then((res) => {
-                    dispatch(addOneTimeEvents(res.data.oneTimeEvents));
-                    dispatch(addRepetitiveEvents(res.data.repetitiveEvents));
-                });
+        axios.get<GetRes>("/api/events", { params: { months } })
+            .then((res) => {
+                dispatch(addOneTimeEvents(res.data.oneTimeEvents));
+                dispatch(addRepetitiveEvents(res.data.repetitiveEvents));
+            });
     }
 
     return { events, newEvent, deleteEvent, newMonths };

@@ -1,6 +1,6 @@
 import { IsISO8601 } from "class-validator"
 
-export class sendEventsParams {
+export class getEventsDto {
     @IsISO8601({}, {
         each: true,
     })

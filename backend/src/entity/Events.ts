@@ -16,10 +16,10 @@ export class Events extends BaseEntity {
     message: string
 
     @Column({ nullable: true })
-    sendingDate: Date
+    eventDate: Date
 
     @Column({ nullable: true })
-    hourPeriodicity: string
+    time: string
 
     @Column({ nullable: true })
     dayPeriodicity: string

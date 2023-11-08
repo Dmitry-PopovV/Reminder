@@ -1,6 +1,6 @@
 import { Length } from 'class-validator';
 
-export class RegistrationParams {
+export class RegistrationDto {
     @Length(73, 73)
     code: string
 }

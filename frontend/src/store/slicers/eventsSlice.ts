@@ -14,9 +14,10 @@ export type RepetitiveEvent = {
     message: string
     time: string
     dayPeriodicity: string
-    weekPeriodicity: string
     monthPeriodicity: string
     yearPeriodicity: string
+    dayOfWeekPeriodicity: string
+    weekDayNumber: number
 }
 
 export type MonthEvents = {
@@ -28,11 +29,18 @@ export type AllEvents = {
     repetitiveEvents: RepetitiveEvent[]
 }
 
+export type LoadedMonths = {
+    start: string,
+    end: string 
+}
+
 export type InitialState = {
     events: AllEvents | null | undefined
+    loadedMonths: LoadedMonths | undefined
 }
 const initialState: InitialState = {
-    events: undefined
+    events: undefined,
+    loadedMonths: undefined
 };
 
 function cutDay(date: string) {
@@ -74,7 +82,11 @@ export const eventSlice = createSlice({
         addOneTimeEvents: (state, action: PayloadAction<OneTimeEvent[]>) => {
             if (!state.events) throw new Error("'events' is not initialaized");
 
-            action.payload.forEach((val) => { safePushOneTimeEvent(state.events!.oneTimeEvents, cutDay(val.start), val); })
+            action.payload.forEach((val) => {
+                if (!state.events!.oneTimeEvents[cutDay(val.start)] && -1 === state.events!.oneTimeEvents[cutDay(val.start)].findIndex((el: OneTimeEvent) => el.id === val.id)) {
+                    safePushOneTimeEvent(state.events!.oneTimeEvents, cutDay(val.start), val);
+                }
+            })
         },
         deleteOneTimeEvent: (state, action: PayloadAction<{ month: string, id: string }>) => {
             if (!state.events) throw new Error("'events' is not initialaized");
@@ -85,7 +97,11 @@ export const eventSlice = createSlice({
         addRepetitiveEvents: (state, action: PayloadAction<RepetitiveEvent[]>) => {
             if (!state.events) throw new Error("'events' is not initialaized");
 
-            action.payload.forEach((val) => { safePushRepetitiveEvent(state.events!, val); })
+            action.payload.forEach((val) => {
+                if (-1 === state.events!.repetitiveEvents.findIndex((el: RepetitiveEvent) => el.id === val.id)) {
+                    safePushRepetitiveEvent(state.events!, val);
+                }
+            })
         },
         deleteRepetitiveEvent: (state, action: PayloadAction<string>) => {
             if (!state.events) throw new Error("'events' is not initialaized");
@@ -93,8 +109,48 @@ export const eventSlice = createSlice({
             const elIndex = state.events.repetitiveEvents.findIndex((el: RepetitiveEvent) => el.id === action.payload);
             state.events.repetitiveEvents.splice(elIndex, 0);
         },
+        updateLoadedMonths: (state, action: PayloadAction<LoadedMonths>) => {
+            function smallest(first: string, second: string) {
+                const splitedFirst = first.split('-');
+                const splitedSecond = second.split('-');
+                if(Number(splitedFirst[0]) < Number(splitedSecond[0])) {
+                    return first;
+                } else if(Number(splitedFirst[0]) === Number(splitedSecond[0])) {
+                    if(Number(splitedFirst[1]) < Number(splitedSecond[1])) {
+                        return first;
+                    } else {
+                        return second;
+                    }
+                } else {
+                    return second;
+                }
+            }
+
+            function biggest(first: string, second: string) {
+                const splitedFirst = first.split('-');
+                const splitedSecond = second.split('-');
+                if(Number(splitedFirst[0]) > Number(splitedSecond[0])) {
+                    return first;
+                } else if(Number(splitedFirst[0]) === Number(splitedSecond[0])) {
+                    if(Number(splitedFirst[1]) > Number(splitedSecond[1])) {
+                        return first;
+                    } else {
+                        return second;
+                    }
+                } else {
+                    return second;
+                }
+            }
+
+            if(!state.loadedMonths) {
+                state.loadedMonths = action.payload;
+            } else {
+                state.loadedMonths.start = smallest(state.loadedMonths.start, action.payload.start);
+                state.loadedMonths.end = biggest(state.loadedMonths.end, action.payload.end);
+            }
+        }
     }
 });
 
-export const { setEvents, addOneTimeEvents, deleteOneTimeEvent, addRepetitiveEvents, deleteRepetitiveEvent } = eventSlice.actions;
+export const { setEvents, addOneTimeEvents, deleteOneTimeEvent, addRepetitiveEvents, deleteRepetitiveEvent, updateLoadedMonths } = eventSlice.actions;
 export default eventSlice.reducer;

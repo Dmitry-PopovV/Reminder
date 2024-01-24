@@ -5,7 +5,6 @@ type returnedEvents = {
         id: string
         title: string
         message: string
-        start: string
         time: string
     }[],
     repetitiveEvents: {
@@ -14,9 +13,10 @@ type returnedEvents = {
         message: string
         time: string
         dayPeriodicity: string
-        weekPeriodicity: string
         monthPeriodicity: string
         yearPeriodicity: string
+        dayOfWeekPeriodicity: string
+        weekDayNumber: number
     }[]
 }
 
@@ -28,19 +28,31 @@ export async function findEvents(months: string[]) {
         .where(
             `events.eventDate BETWEEN :searchStart AND :searchEnd 
             OR events.monthPeriodicity = '*' 
-            OR CAST(events.monthPeriodicity AS double precision) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP))`
+            OR (POSITION('/' IN events.monthPeriodicity) != 0 AND
+            CASE
+            WHEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) < EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)) THEN
+            EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) 
+            - MOD(EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)), 
+            CAST(substring(events.monthPeriodicity from POSITION('/' IN events.monthPeriodicity) + 1 for char_length(events.monthPeriodicity)) AS numeric)) 
+            + CAST(substring(events.monthPeriodicity from POSITION('/' IN events.monthPeriodicity) + 1 for char_length(events.monthPeriodicity)) AS numeric) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)) 
+            WHEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) >= EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)) THEN
+            EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) 
+            - MOD(EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)), 
+            CAST(substring(events.monthPeriodicity from POSITION('/' IN events.monthPeriodicity) + 1 for char_length(events.monthPeriodicity)) AS numeric)) 
+            + CAST(substring(events.monthPeriodicity from POSITION('/' IN events.monthPeriodicity) + 1 for char_length(events.monthPeriodicity)) AS numeric) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)) + 12 
+            END)
+            OR (POSITION('/' IN events.monthPeriodicity) = 0 AND CAST(events.monthPeriodicity AS double precision) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)))`
             , { searchStart, searchEnd })
         .getMany();
     let res: returnedEvents = { oneTimeEvents: [], repetitiveEvents: [] };
     events.forEach((val) => {
         if (val.eventDate) {
-            const [start, time] = val.eventDate.toISOString().split('T');
+            const time = val.eventDate.toISOString();
             res.oneTimeEvents.push(
                 {
                     id: val.id,
                     title: val.title,
                     message: val.message,
-                    start,
                     time
                 }
             );
@@ -50,11 +62,12 @@ export async function findEvents(months: string[]) {
                     id: val.id,
                     title: val.title,
                     message: val.message,
-                    time: val.time,
+                    time: val.time.toISOString(),
                     dayPeriodicity: val.dayPeriodicity,
-                    weekPeriodicity: val.weekPeriodicity,
                     monthPeriodicity: val.monthPeriodicity,
-                    yearPeriodicity: val.yearPeriodicity
+                    yearPeriodicity: val.yearPeriodicity,
+                    dayOfWeekPeriodicity: val.dayOfWeekPeriodicity,
+                    weekDayNumber: val.weekDayNumber
                 });
         }
     })

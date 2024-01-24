@@ -3,8 +3,9 @@ import axios from 'axios';
 import addMonths from 'date-fns/addMonths';
 import subMonths from 'date-fns/subMonths';
 import set from 'date-fns/set';
+import format from 'date-fns/format';
 import { useAppSelector, useAppDispatch } from "../store";
-import { OneTimeEvent, RepetitiveEvent, setEvents, addOneTimeEvents, deleteOneTimeEvent, addRepetitiveEvents, deleteRepetitiveEvent } from "../store/slicers/eventsSlice"
+import { OneTimeEvent, RepetitiveEvent, setEvents, addOneTimeEvents, deleteOneTimeEvent, addRepetitiveEvents, deleteRepetitiveEvent, updateLoadedMonths } from "../store/slicers/eventsSlice"
 
 function getInitialMonths() {
     const currentMonth = new Date();
@@ -17,20 +18,38 @@ function getInitialMonths() {
     ];
 }
 
+function addStartProperty(arr: { id: string; title: string; message: string; time: string; }[]): OneTimeEvent[] {
+    return Array.from(arr, (val) => { return { ...val, start: format(new Date(val.time), "y-M-dd") } })
+}
+
 type GetRes = {
-    oneTimeEvents: OneTimeEvent[]
+    oneTimeEvents: {
+        id: string;
+        title: string;
+        message: string;
+        time: string;
+    }[]
     repetitiveEvents: RepetitiveEvent[]
 }
 
 export function useEvents() {
-    const events = useAppSelector((state) => state.events.events);
+    const { events, loadedMonths } = useAppSelector((state) => state.events);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
         if (!events) {
             axios.get<GetRes>("/api/events", { params: { months: getInitialMonths() } })
                 .then((res) => {
-                    dispatch(setEvents(res.data));
+                    const newEvents = {
+                        oneTimeEvents: addStartProperty(res.data.oneTimeEvents),
+                        repetitiveEvents: res.data.repetitiveEvents
+                    }
+                    dispatch(setEvents(newEvents));
+                    const initialMonths = getInitialMonths();
+                    dispatch(updateLoadedMonths({
+                        start: initialMonths[0].toISOString().split('T')[0],
+                        end: initialMonths[1].toISOString().split('T')[0]
+                    }))
                 });
         }
     }, [])
@@ -55,10 +74,15 @@ export function useEvents() {
     function newMonths(months: Date[]) {
         axios.get<GetRes>("/api/events", { params: { months } })
             .then((res) => {
-                dispatch(addOneTimeEvents(res.data.oneTimeEvents));
+                dispatch(addOneTimeEvents(addStartProperty(res.data.oneTimeEvents)));
                 dispatch(addRepetitiveEvents(res.data.repetitiveEvents));
+                dispatch(updateLoadedMonths({
+                    start: months[0].toISOString().split('T')[0],
+                    end: months[1].toISOString().split('T')[0]
+                }))
+                //console.log("new months:", months);
             });
     }
 
-    return { events, newEvent, deleteEvent, newMonths };
+    return { events, loadedMonths, newEvent, deleteEvent, newMonths };
 }

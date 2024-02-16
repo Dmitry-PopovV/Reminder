@@ -19,21 +19,32 @@ import { RepetitiveEvent } from '../store/slicers/eventsSlice';
 
 function isEventOnThisDay(event: RepetitiveEvent, date: string) {
     const splitedDate = date.split('-');
+    const parsedDate = parse(date, "y-MM-dd", new Date());
+
+    const isMonthCorrectNumberOrAny = event.monthPeriodicity === '*' || Number(event.monthPeriodicity) === Number(splitedDate[1]) - 1;
+    const isDayCorrectNumberOrAny = event.dayPeriodicity === '*' || Number(event.dayPeriodicity) === Number(splitedDate[2]);
+
+    const isDayPeriod = event.dayPeriodicity.match(/^.\/.$/);
+    const doesDayPeriodMatch = differenceInCalendarDays(new Date(event.time), parsedDate) % Number(event.dayPeriodicity.split('/')[1]) === 0;
+
+    const isMonthPeriod = event.monthPeriodicity.match(/^.\/.$/);
+    const doesMonthPeriodMatch = differenceInCalendarMonths(new Date(event.time), parsedDate) % Number(event.monthPeriodicity.split('/')[1]) === 0;
+
+    const isDayCorrectNumber = Number(event.dayPeriodicity) === Number(splitedDate[2]);
+    const isDayOfWeekCorrectNumber = Number(event.dayOfWeekPeriodicity) === getDay(parsedDate);
+    const isDayOfWeekThisDay = isSameDay(parsedDate, addDays(startOfWeek(startOfMonth(parsedDate)), Number(event.dayOfWeekPeriodicity) + 7 * (Number(event.weekDayNumber) - (getDay(startOfMonth(parsedDate)) > Number(event.dayOfWeekPeriodicity) ? 0 : 1))));
+
+    const isYearAny = event.yearPeriodicity === '*';
+    const isYearPeriod = event.yearPeriodicity.match(/^.\/.$/);
+    const doesYearPeriodMatch = differenceInCalendarYears(new Date(event.time), parsedDate) % Number(event.yearPeriodicity.split('/')[1]) === 0;
     return (
-        (
-            (event.monthPeriodicity === '*' || Number(event.monthPeriodicity) === Number(splitedDate[1]) - 1)
-            && (event.dayPeriodicity === '*' || Number(event.dayPeriodicity) === Number(splitedDate[2]))
-        )
-        || (event.dayPeriodicity.match(/^.\/.$/) && (differenceInCalendarDays(new Date(event.time), parse(date, "y-MM-dd", new Date())) % Number(event.dayPeriodicity.split('/')[1]) === 0))
+        (isMonthCorrectNumberOrAny && isDayCorrectNumberOrAny)
+        || (isDayPeriod && doesDayPeriodMatch)
         || (
-            (event.monthPeriodicity.match(/^.\/.$/) && (differenceInCalendarMonths(new Date(event.time), parse(date, "y-MM-dd", new Date())) % Number(event.monthPeriodicity.split('/')[1]) === 0))
-            && (
-                Number(event.dayPeriodicity) === Number(splitedDate[2]) || (
-                    Number(event.dayOfWeekPeriodicity) === getDay(parse(date, "y-MM-dd", new Date())) && (isSameDay(parse(date, "y-MM-dd", new Date()), addDays(startOfWeek(startOfMonth(parse(date, "y-MM-dd", new Date()))), Number(event.dayOfWeekPeriodicity) + 7 * (Number(event.weekDayNumber) - (getDay(startOfMonth(parse(date, "y-MM-dd", new Date()))) > Number(event.dayOfWeekPeriodicity) ? 0 : 1)))))
-                )
-            )
+            (isMonthPeriod && doesMonthPeriodMatch)
+            && (isDayCorrectNumber || (isDayOfWeekCorrectNumber && isDayOfWeekThisDay))
         )
-    ) && (event.yearPeriodicity === '*' || (event.yearPeriodicity.match(/^.\/.$/) && (differenceInCalendarYears(new Date(event.time), parse(date, "y-MM-dd", new Date())) % Number(event.yearPeriodicity.split('/')[1]) === 0)));
+    ) && (isYearAny || (isYearPeriod && doesYearPeriodMatch));
 }
 
 export default function EventsList() {

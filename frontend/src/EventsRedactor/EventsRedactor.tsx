@@ -193,22 +193,34 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
         const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         if (isRepetitive && !(event as OneTimeEvent).start) {
-            switch (repeatPeriodRef.current ? repeatPeriodRef.current.value : getRepeatPeriod(event as RepetitiveEvent).split('-')[0]) {
+            const notNullRepeatPeriod = repeatPeriodRef.current ? repeatPeriodRef.current.value : getRepeatPeriod(event as RepetitiveEvent).split('-')[0];
+            switch (notNullRepeatPeriod) {
                 case "day":
-                    return `Every ${Number((event as RepetitiveEvent).dayPeriodicity.split('/')[1])} day(s)`;
+                    const dayPeriodicity = Number((event as RepetitiveEvent).dayPeriodicity.split('/')[1]);
+                    return `Every ${dayPeriodicity} day(s)`;
                 case "week":
-                    return `Every ${(event as RepetitiveEvent).dayOfWeekPeriodicity.split('/')[1]} week on ${daysOfWeek[Number((event as RepetitiveEvent).dayOfWeekPeriodicity.split('/')[0])]}`;
+                    const weekPeriodicity = (event as RepetitiveEvent).dayOfWeekPeriodicity.split('/')[1];
+                    const weekdayInWeek = daysOfWeek[Number((event as RepetitiveEvent).dayOfWeekPeriodicity.split('/')[0])];
+                    return `Every ${weekPeriodicity} week on ${weekdayInWeek}`;
                 case "month":
+                    const monthPeriodicity = (event as RepetitiveEvent).monthPeriodicity.split('/')[1];
+                    const weekdayNumber = toOrdinal((event as RepetitiveEvent).weekDayNumber);
+                    const weekdayInMonth = daysOfWeek[Number((event as RepetitiveEvent).dayOfWeekPeriodicity)];
+                    const dateInMonth = toOrdinal(getDate(new Date(event.time)));
                     if (isRelatedOnDaysOfWeek) {
-                        return `Every ${(event as RepetitiveEvent).monthPeriodicity.split('/')[1]} month on ${toOrdinal((event as RepetitiveEvent).weekDayNumber)} ${daysOfWeek[Number((event as RepetitiveEvent).dayOfWeekPeriodicity)]}`;
+                        return `Every ${monthPeriodicity} month on ${weekdayNumber} ${weekdayInMonth}`;
                     } else {
-                        return `Every ${(event as RepetitiveEvent).monthPeriodicity.split('/')[1]} month on ${toOrdinal(getDate(new Date(event.time)))}`;
+                        return `Every ${monthPeriodicity} month on ${dateInMonth}`;
                     }
                 case "year":
-                    return `Every ${(event as RepetitiveEvent).yearPeriodicity.split('/')[1]} year on ${toOrdinal(getDate(new Date(event.time)))} of ${months[getMonth(new Date(event.time))]}`;
+                    const yearPeriodicity = (event as RepetitiveEvent).yearPeriodicity.split('/')[1];
+                    const dateInYear = toOrdinal(getDate(new Date(event.time)));
+                    const month = months[getMonth(new Date(event.time))];
+                    return `Every ${yearPeriodicity} year on ${dateInYear} of ${month}`;
             }
         } else {
-            return `On ${event.time.split('T')[0]}`;
+            const date = event.time.split('T')[0]
+            return `On ${date}`;
         }
 
     }

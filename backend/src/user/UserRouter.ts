@@ -4,4 +4,4 @@ import { sendUserController } from "./controllers/sendUserController";
 export const UserRouter = Router();
 
 UserRouter
-  .post("/user", sendUserController);
+    .post("/user", sendUserController);

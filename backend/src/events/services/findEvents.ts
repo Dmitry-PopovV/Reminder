@@ -5,7 +5,6 @@ type returnedEvents = {
         id: string
         title: string
         message: string
-        start: string
         time: string
     }[],
     repetitiveEvents: {
@@ -14,33 +13,50 @@ type returnedEvents = {
         message: string
         time: string
         dayPeriodicity: string
-        weekPeriodicity: string
         monthPeriodicity: string
         yearPeriodicity: string
+        dayOfWeekPeriodicity: string
+        weekDayNumber: number
     }[]
 }
 
 export async function findEvents(months: string[]) {
     const searchStart = new Date(months[0]);
     const searchEnd = new Date(months[1]);
-    const events = await Events
-        .createQueryBuilder("events")
-        .where(
-            `events.eventDate BETWEEN :searchStart AND :searchEnd 
-            OR events.monthPeriodicity = '*' 
-            OR CAST(events.monthPeriodicity AS double precision) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP))`
-            , { searchStart, searchEnd })
-        .getMany();
+    const events: Events[] = await Events
+        .query(
+            `SELECT * FROM "events" WHERE "events"."eventDate" BETWEEN $1 AND $2
+                OR "events"."monthPeriodicity" = '*'
+                OR (
+                    POSITION('/' IN "events"."monthPeriodicity") != 0 AND
+                    CASE
+                        WHEN getMonth($1) < getMonth($2) THEN
+                            getMonth($1)
+                            - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity"))
+			                + getMonthPeriodicity("events"."monthPeriodicity")
+                            BETWEEN getMonth($1) AND getMonth($2)
+                        WHEN getMonth($1) >= getMonth($2) THEN
+                            getMonth($1)
+                            - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity"))
+			                + getMonthPeriodicity("events"."monthPeriodicity")
+                            BETWEEN getMonth($1) AND getMonth($2) + 12
+                    END
+                )
+                OR (
+                    POSITION('/' IN "events"."monthPeriodicity") = 0 AND
+                    CAST("events"."monthPeriodicity" AS double precision)
+                    BETWEEN getMonth($1) AND getMonth($2)
+                )`
+            , [searchStart, searchEnd]);
     let res: returnedEvents = { oneTimeEvents: [], repetitiveEvents: [] };
     events.forEach((val) => {
         if (val.eventDate) {
-            const [start, time] = val.eventDate.toISOString().split('T');
+            const time = val.eventDate.toISOString();
             res.oneTimeEvents.push(
                 {
                     id: val.id,
                     title: val.title,
                     message: val.message,
-                    start,
                     time
                 }
             );
@@ -50,11 +66,12 @@ export async function findEvents(months: string[]) {
                     id: val.id,
                     title: val.title,
                     message: val.message,
-                    time: val.time,
+                    time: val.time.toISOString(),
                     dayPeriodicity: val.dayPeriodicity,
-                    weekPeriodicity: val.weekPeriodicity,
                     monthPeriodicity: val.monthPeriodicity,
-                    yearPeriodicity: val.yearPeriodicity
+                    yearPeriodicity: val.yearPeriodicity,
+                    dayOfWeekPeriodicity: val.dayOfWeekPeriodicity,
+                    weekDayNumber: val.weekDayNumber
                 });
         }
     })

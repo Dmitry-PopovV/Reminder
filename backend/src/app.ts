@@ -12,23 +12,23 @@ const port = 3000;
 const cookieTime = 24 * 60 * 60 * 1000;
 
 async function main() {
-  try {
-    const { cookieSecret } = await serverInitialize();
+    try {
+        const { cookieSecret } = await serverInitialize();
 
-    app
-      .use(express.json())
-      .use(session({ secret: cookieSecret, cookie: { maxAge: cookieTime,  httpOnly: true}, resave: false, saveUninitialized: true }))
-      .get('/', (req, res) => {
-        res.send('Hello World!');
-      })
-      .use("/api", Routers)
-      .use(ErrorMidleware);
-    app
-      .listen(port, () => {
-        console.log(`Example app listening on port ${port}`);
-      });
-  } catch (err) {
-    console.log("Fatal error:\n", err);
-  }
+        app
+            .use(express.json())
+            .use(session({ secret: cookieSecret, cookie: { maxAge: cookieTime, httpOnly: true }, resave: false, saveUninitialized: true }))
+            .get('/', (req, res) => {
+                res.send('Hello World!');
+            })
+            .use("/api", Routers)
+            .use(ErrorMidleware);
+        app
+            .listen(port, () => {
+                console.log(`Example app listening on port ${port}`);
+            });
+    } catch (err) {
+        console.log("Fatal error:\n", err);
+    }
 }
 main();

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Navigate } from 'react-router';
 import { useOutletContext } from "react-router-dom";
 import Form from "react-bootstrap/Form";
@@ -13,67 +13,25 @@ import subWeeks from 'date-fns/subWeeks';
 import getDay from 'date-fns/getDay';
 import getDate from 'date-fns/getDate';
 import getMonth from 'date-fns/getMonth';
-import parse from 'date-fns/parse';
 import { Select } from "../types/Select";
 import { useEvents } from '../hooks/useEvents';
 import { OneTimeEvent, RepetitiveEvent } from '../store/slicers/eventsSlice';
 import getRepeatPeriod from '../functions/getRepeatPeriod';
+import useSetup from './useSetup';
+
 
 export default function EventsRedactor() {
-    const [select, setSelect] = useOutletContext<[Select, (param: Select) => void]>();
+    const { select, setSelect } = useOutletContext<{ select: Select, setSelect: (param: Select) => void }>();
     return <Redactor select={select} setSelect={setSelect} key={select.eventID} />
 }
 
 function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Select) => void }) {
     const { events, newEvent, deleteEvent } = useEvents();
 
-    function setup() {
-        const placeholderEvent = {
-            id: "",
-            title: "_placeholderEvent",
-            message: "",
-            start: "",
-            time: ""
-        }
-
-        let defaultIsRepetitive = false;
-        let defaultIsRelatedOnDaysOfWeek: boolean = false;
-        let selectedEvent: OneTimeEvent | RepetitiveEvent | undefined;
-        if (events && select.view === "redactor" && select.isNew) {
-
-            selectedEvent = events.repetitiveEvents.find((el: RepetitiveEvent) => { return select.eventID ? el.id === select.eventID.split("@")[0] : false });
-            if (!selectedEvent) {
-                const splitedDate = select.date.split('-');
-                const month = `${splitedDate[0]}-${splitedDate[1]}`;
-                if (events.oneTimeEvents[month]) {
-                    selectedEvent = events.oneTimeEvents[month].find((el: OneTimeEvent) => el.id === select.eventID);
-                }
-            } else {
-                defaultIsRepetitive = true;
-                if(getRepeatPeriod(selectedEvent) === "month-weekday") {
-                    defaultIsRelatedOnDaysOfWeek = true;
-                }
-            }
-            if (!selectedEvent) {
-                selectedEvent = {
-                    id: "",
-                    title: "New event",
-                    message: "",
-                    start: select.date,
-                    time: parse(select.date!, "y-M-d", new Date()).toISOString()
-                }
-            }
-        }
-
-        
-
-        return { defaultIsRepetitive, defaultEvent: selectedEvent ? selectedEvent : placeholderEvent, defaultIsRelatedOnDaysOfWeek };
-    }
-    const { defaultIsRepetitive, defaultEvent, defaultIsRelatedOnDaysOfWeek } = setup();
-
-    const [isRepetitive, setIsRepetitive] = useState(defaultIsRepetitive);
-    const [isRelatedOnDaysOfWeek, setIsRelatedOnDaysOfWeek] = useState(defaultIsRelatedOnDaysOfWeek);
-    const [event, setEvent] = useState<OneTimeEvent | RepetitiveEvent>(defaultEvent);
+    const { isRepetitiveState, isRelatedOnDaysOfWeekState, eventState } = useSetup(events, select);
+    const [isRepetitive, setIsRepetitive] = isRepetitiveState;
+    const [isRelatedOnDaysOfWeek, setIsRelatedOnDaysOfWeek] = isRelatedOnDaysOfWeekState;
+    const [event, setEvent] = eventState;
 
     const repeatNumberRef = useRef<HTMLInputElement>(null);
     const repeatPeriodRef = useRef<HTMLSelectElement>(null);
@@ -151,14 +109,6 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
         const repeatNumber = repeatNumberRef.current!.value;
         const repeatPeriod = repeatPeriodRef.current!.value;
 
-        function setPeriodicity(newVal: RepetitiveEvent, dayPeriodicity: string, monthPeriodicity: string, yearPeriodicity: string, dayOfWeekPeriodicity: string, weekDayNumber: number) {
-            newVal.dayPeriodicity = dayPeriodicity;
-            newVal.monthPeriodicity = monthPeriodicity;
-            newVal.yearPeriodicity = yearPeriodicity;
-            newVal.dayOfWeekPeriodicity = dayOfWeekPeriodicity;
-            newVal.weekDayNumber = weekDayNumber;
-        }
-
         function getWeekDayNumber(date: Date) {
             let newDate = new Date(date.toISOString());
             let i = 0;
@@ -171,20 +121,40 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
 
         switch (repeatPeriod) {
             case "day":
-                setPeriodicity(newVal, "*/" + repeatNumber, "*", "*", "*", 0);
+                newVal.dayPeriodicity = "*/" + repeatNumber;
+                newVal.monthPeriodicity = "*";
+                newVal.yearPeriodicity = "*";
+                newVal.dayOfWeekPeriodicity = "*";
+                newVal.weekDayNumber = 0;
                 break;
             case "week":
-                setPeriodicity(newVal, "*", "*", "*", getDay(new Date(newVal.time)) + "/" + repeatNumber, 0);
+                newVal.dayPeriodicity = "*";
+                newVal.monthPeriodicity = "*";
+                newVal.yearPeriodicity = "*";
+                newVal.dayOfWeekPeriodicity = getDay(new Date(newVal.time)) + "/" + repeatNumber;
+                newVal.weekDayNumber = 0;
                 break;
             case "month":
                 if (isRelatedOnDaysOfWeek) {
-                    setPeriodicity(newVal, "*", "*/" + repeatNumber, "*", '' + getDay(new Date(newVal.time)), getWeekDayNumber(new Date(newVal.time)));
+                    newVal.dayPeriodicity = "*";
+                    newVal.monthPeriodicity = "*/" + repeatNumber;
+                    newVal.yearPeriodicity = "*";
+                    newVal.dayOfWeekPeriodicity = '' + getDay(new Date(newVal.time));
+                    newVal.weekDayNumber = getWeekDayNumber(new Date(newVal.time));
                 } else {
-                    setPeriodicity(newVal, '' + getDate(new Date(newVal.time)), "*/" + repeatNumber, "*", "*", 0);
+                    newVal.dayPeriodicity = '' + getDate(new Date(newVal.time));
+                    newVal.monthPeriodicity = "*/" + repeatNumber;
+                    newVal.yearPeriodicity = "*";
+                    newVal.dayOfWeekPeriodicity = "*";
+                    newVal.weekDayNumber = 0;
                 }
                 break;
             case "year":
-                setPeriodicity(newVal, '' + getDate(new Date(newVal.time)), '' + getMonth(new Date(newVal.time)), "*/" + repeatNumber, "*", 0);
+                newVal.dayPeriodicity = '' + getDate(new Date(newVal.time));
+                newVal.monthPeriodicity = '' + getMonth(new Date(newVal.time));
+                newVal.yearPeriodicity = "*/" + repeatNumber;
+                newVal.dayOfWeekPeriodicity = "*";
+                newVal.weekDayNumber = 0;
                 break;
         }
     }
@@ -205,9 +175,9 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
     }
 
     function toOrdinal(num: number) {
-        if(num < 4 || num > 20) {
+        if (num < 4 || num > 20) {
             const lastDigit = num % 10;
-            switch(lastDigit) {
+            switch (lastDigit) {
                 case 1:
                     return num + 'st';
                 case 2:
@@ -256,56 +226,110 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
         return (event as RepetitiveEvent).dayPeriodicity.split('/')[1];
     }
 
-    function onSave() {
+    function onSave() {//work in progress
         console.log(event);
     }
 
     if (select.view !== "redactor") {
         return (<Navigate to={"/calendar"} />);
-    } else if (!events) {
-        return (<>Unexpected error</>);
-    } else {
-        return (
-            <div>
-                <InputGroup className="mb-3">
-                    <Button onClick={onExitClick}>←</Button>
-                    <Form.Control id="title" as="input" placeholder="Event name" value={event.title} onChange={onChangeTitle} />
-                </InputGroup>
-                <div className="mb-3">
-                    <Form.Control id="message" as="textarea" rows={2} placeholder="Your message" value={event.message} onChange={onChangeMessage} />
-                </div>
-                <InputGroup className="mb-3">
-                    <InputGroup.Text id="description">{getDescription()}</InputGroup.Text>
-                    <Form.Control id="time" type="time" aria-describedby="date" value={format(new Date(event.time), "HH:mm")} onChange={onChangeTime} />{/*<------*/}
-                </InputGroup>
-                <div className="mb-3">
-                    <Form.Check id="isRepetitive" type="checkbox" label={`Is repetitive`} checked={isRepetitive} onChange={onChangeIsRepetitive} />
-                    {
-                        isRepetitive && !(event as OneTimeEvent).start ? <>
-                            {/\//.test((event as RepetitiveEvent).monthPeriodicity) ? <Form.Check id="isRelatedOnDaysOfWeek" type="checkbox" label={`Is related on days of week`} checked={isRelatedOnDaysOfWeek} onChange={onChangeIsRelatedOnDaysOfWeek} /> : <></>}
-                            <InputGroup>
-                                <InputGroup.Text>Repeat every</InputGroup.Text>
-                                <Form.Control id="repeatNumber" type="number" min="1" defaultValue={getRepeatNumber()} onChange={onChangePeriodicity} ref={repeatNumberRef} />
-                                <Form.Select id="repeatPeriod" aria-label="period" defaultValue={getRepeatPeriod(event as RepetitiveEvent).split('-')[0]} onChange={onChangePeriodicity} ref={repeatPeriodRef}>
-                                    <option value="day">day</option>
-                                    <option value="week">week</option>
-                                    <option value="month">month</option>
-                                    <option value="year">year</option>
-                                </Form.Select>
-                            </InputGroup>
-                        </> : <></>
-                    }
-                </div>
-                <div className="mb-3">
-                    <div>
-                        <Button className='w-100' onClick={onSave}>Save</Button>
-                    </div>
-                    <Row>
-                        <Col className='gy-1'><Button className='w-100'>Test send</Button></Col>
-                        <Col className='gy-1'><Button className='w-100' variant='danger'>Delete</Button></Col>
-                    </Row>
-                </div>
-            </div>
-        )
     }
+    if (!events) {
+        return (<>Unexpected error</>);
+    }
+
+    const repeatPeriodForm = isRepetitive && !(event as OneTimeEvent).start ?
+        <>
+            {
+                /\//.test((event as RepetitiveEvent).monthPeriodicity) ?
+                    <Form.Check
+                        id="isRelatedOnDaysOfWeek"
+                        type="checkbox"
+                        label={`Is related on days of week`}
+                        checked={isRelatedOnDaysOfWeek}
+                        onChange={onChangeIsRelatedOnDaysOfWeek}
+                    />
+                    : null
+            }
+            <InputGroup>
+                <InputGroup.Text>Repeat every</InputGroup.Text>
+                <Form.Control
+                    id="repeatNumber"
+                    type="number"
+                    min="1"
+                    defaultValue={getRepeatNumber()}
+                    onChange={onChangePeriodicity}
+                    ref={repeatNumberRef}
+                />
+                <Form.Select
+                    id="repeatPeriod"
+                    aria-label="period"
+                    defaultValue={getRepeatPeriod(event as RepetitiveEvent).split('-')[0]}
+                    onChange={onChangePeriodicity}
+                    ref={repeatPeriodRef}
+                >
+                    <option value="day">day</option>
+                    <option value="week">week</option>
+                    <option value="month">month</option>
+                    <option value="year">year</option>
+                </Form.Select>
+            </InputGroup>
+        </> : null;
+
+    return (
+        <div>
+            <InputGroup className="mb-3">
+                <Button onClick={onExitClick}>←</Button>
+                <Form.Control
+                    id="title"
+                    as="input"
+                    placeholder="Event name"
+                    value={event.title}
+                    onChange={onChangeTitle}
+                />
+            </InputGroup>
+            <div className="mb-3">
+                <Form.Control
+                    id="message"
+                    as="textarea"
+                    rows={2}
+                    placeholder="Your message"
+                    value={event.message}
+                    onChange={onChangeMessage}
+                />
+            </div>
+            <InputGroup className="mb-3">
+                <InputGroup.Text id="description">{getDescription()}</InputGroup.Text>
+                <Form.Control
+                    id="time"
+                    type="time"
+                    aria-describedby="date"
+                    value={format(new Date(event.time), "HH:mm")}
+                    onChange={onChangeTime}
+                />
+            </InputGroup>
+            <div className="mb-3">
+                <Form.Check
+                    id="isRepetitive"
+                    type="checkbox"
+                    label={`Is repetitive`}
+                    checked={isRepetitive}
+                    onChange={onChangeIsRepetitive}
+                />
+                {repeatPeriodForm}
+            </div>
+            <div className="mb-3">
+                <div>
+                    <Button className='w-100' onClick={onSave}>Save</Button>
+                </div>
+                <Row>
+                    <Col className='gy-1'>
+                        <Button className='w-100'>Test send</Button>
+                    </Col>
+                    <Col className='gy-1'>
+                        <Button className='w-100' variant='danger'>Delete</Button>
+                    </Col>
+                </Row>
+            </div>
+        </div>
+    )
 }

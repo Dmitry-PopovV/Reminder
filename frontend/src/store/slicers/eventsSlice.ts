@@ -83,7 +83,10 @@ export const eventSlice = createSlice({
             if (!state.events) throw new Error("'events' is not initialaized");
 
             action.payload.forEach((val) => {
-                if (!state.events!.oneTimeEvents[cutDay(val.start)] && -1 === state.events!.oneTimeEvents[cutDay(val.start)].findIndex((el: OneTimeEvent) => el.id === val.id)) {
+                if (!state.events!.oneTimeEvents[cutDay(val.start)]) {
+                    state.events!.oneTimeEvents[cutDay(val.start)] = [];
+                }
+                if (-1 === state.events!.oneTimeEvents[cutDay(val.start)].findIndex((el: OneTimeEvent) => el.id === val.id)) {
                     safePushOneTimeEvent(state.events!.oneTimeEvents, cutDay(val.start), val);
                 }
             })

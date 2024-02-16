@@ -9,21 +9,21 @@ import { Select } from "../types/Select";
 
 
 export default function Layout() {
-	const [select, setSelect] = useState<Select>({view: "noSelection", date: null, eventID: null})
+    const [select, setSelect] = useState<Select>({ view: "noSelection", date: null, eventID: null })
 
-	return ( 
-		<div>
-			<Head />
-			<Container fluid>
-				<Row xs={1} md={2}>
-					<Col className="gy-1">
-						<Calendar setSelect={setSelect}/>
-					</Col>
-					<Col className="gy-1">
-						<Outlet context={[select, setSelect]}/>
-					</Col>
-				</Row>
-			</Container>
-		</div>
-	);
+    return (
+        <div>
+            <Head />
+            <Container fluid>
+                <Row xs={1} md={2}>
+                    <Col className="gy-1">
+                        <Calendar setSelect={setSelect} />
+                    </Col>
+                    <Col className="gy-1">
+                        <Outlet context={{select, setSelect}} />
+                    </Col>
+                </Row>
+            </Container>
+        </div>
+    );
 }

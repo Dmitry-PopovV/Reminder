@@ -23,27 +23,23 @@ type returnedEvents = {
 export async function findEvents(months: string[]) {
     const searchStart = new Date(months[0]);
     const searchEnd = new Date(months[1]);
-    const events = await Events
-        .createQueryBuilder("events")
-        .where(
-            `events.eventDate BETWEEN :searchStart AND :searchEnd 
-            OR events.monthPeriodicity = '*' 
-            OR (POSITION('/' IN events.monthPeriodicity) != 0 AND
-            CASE
-            WHEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) < EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)) THEN
-            EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) 
-            - MOD(EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)), 
-            CAST(substring(events.monthPeriodicity from POSITION('/' IN events.monthPeriodicity) + 1 for char_length(events.monthPeriodicity)) AS numeric)) 
-            + CAST(substring(events.monthPeriodicity from POSITION('/' IN events.monthPeriodicity) + 1 for char_length(events.monthPeriodicity)) AS numeric) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)) 
-            WHEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) >= EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)) THEN
-            EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) 
-            - MOD(EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)), 
-            CAST(substring(events.monthPeriodicity from POSITION('/' IN events.monthPeriodicity) + 1 for char_length(events.monthPeriodicity)) AS numeric)) 
-            + CAST(substring(events.monthPeriodicity from POSITION('/' IN events.monthPeriodicity) + 1 for char_length(events.monthPeriodicity)) AS numeric) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)) + 12 
-            END)
-            OR (POSITION('/' IN events.monthPeriodicity) = 0 AND CAST(events.monthPeriodicity AS double precision) BETWEEN EXTRACT(MONTH FROM CAST(:searchStart AS TIMESTAMP)) AND EXTRACT(MONTH FROM CAST(:searchEnd AS TIMESTAMP)))`
-            , { searchStart, searchEnd })
-        .getMany();
+    const events: Events[] = await Events
+        .query(
+            `SELECT * FROM "events" WHERE "events"."eventDate" BETWEEN $1 AND $2
+                OR "events"."monthPeriodicity" = '*'
+                OR (POSITION('/' IN "events"."monthPeriodicity") != 0 AND
+                CASE
+                WHEN getMonth($1) < getMonth($2) THEN
+                getMonth($1)
+                - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity")) 
+			    + getMonthPeriodicity("events"."monthPeriodicity") BETWEEN getMonth($1) AND getMonth($2)
+                WHEN getMonth($1) >= getMonth($2) THEN
+                getMonth($1)
+                - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity")) 
+			    + getMonthPeriodicity("events"."monthPeriodicity") BETWEEN getMonth($1) AND getMonth($2) + 12
+                END)
+                OR (POSITION('/' IN "events"."monthPeriodicity") = 0 AND CAST("events"."monthPeriodicity" AS double precision) BETWEEN getMonth($1) AND getMonth($2))`
+            , [searchStart, searchEnd]);
     let res: returnedEvents = { oneTimeEvents: [], repetitiveEvents: [] };
     events.forEach((val) => {
         if (val.eventDate) {

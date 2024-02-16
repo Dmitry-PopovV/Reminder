@@ -7,6 +7,6 @@ import { RegistrationDto } from "./dto/RegistrationDto";
 export const AuthRouter = Router();
 
 AuthRouter
-  .post("/registration", [ValidationMidleware("body", RegistrationDto), RegistrationController])
-  .put("/logout", logoutController);
+    .post("/registration", [ValidationMidleware("body", RegistrationDto), RegistrationController])
+    .put("/logout", logoutController);
 

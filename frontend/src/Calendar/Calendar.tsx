@@ -41,8 +41,8 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
         }
 
         let loadedMonths = { prev: false, next: false };
-        if (undefined !== (events!.oneTimeEvents[toMonthString(prevMonth)])) { loadedMonths.prev = true };
-        if (undefined !== (events!.oneTimeEvents[toMonthString(nextMonth)])) { loadedMonths.next = true };
+        if (events!.oneTimeEvents[toMonthString(prevMonth)] !== undefined) { loadedMonths.prev = true };
+        if (events!.oneTimeEvents[toMonthString(nextMonth)] !== undefined) { loadedMonths.next = true };
         if (loadedMonths.prev === false && loadedMonths.next === false) {
             events!.repetitiveEvents.forEach((val) => {
                 if (val.monthPeriodicity === `${prevMonth.getUTCMonth()}`) loadedMonths.prev = true
@@ -103,14 +103,22 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
             let step: number;
             switch (getRepeatPeriod(val)) {
                 case "day":
-                    dates = eachDayOfInterval({ start: new Date(val.time), end: new Date(loadedMonths!.end!) }, { step: Number(val.dayPeriodicity.split('/')[1]) });
+                    dates = eachDayOfInterval(
+                        { start: new Date(val.time), end: new Date(loadedMonths!.end!) },
+                        { step: Number(val.dayPeriodicity.split('/')[1]) }
+                    );
                     break;
                 case "week":
                     const weekStarts = eachWeekOfInterval({ start: new Date(val.time), end: new Date(loadedMonths!.end!) });
                     step = Number(val.dayOfWeekPeriodicity.split('/')[1]);
                     weekStarts.forEach((date, i) => {
                         if (i % step === 0) {
-                            dates.push(set(addDays(date, Number(val.dayOfWeekPeriodicity.split('/')[0])), { hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }));
+                            dates.push(
+                                set(
+                                    addDays(date, Number(val.dayOfWeekPeriodicity.split('/')[0])),
+                                    { hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }
+                                )
+                            );
                         }
                     })
                     break;
@@ -119,7 +127,12 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
                     step = Number(val.monthPeriodicity.split('/')[1]);
                     monthStarts.forEach((date, i) => {
                         if (i % step === 0) {
-                            dates.push(set(date, { date: Number(val.dayPeriodicity), hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }));
+                            dates.push(
+                                set(
+                                    date,
+                                    { date: Number(val.dayPeriodicity), hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }
+                                )
+                            );
                         }
                     })
                     break;
@@ -130,9 +143,31 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
                         if (i % step === 0) {
                             const startWeekDay = getDay(date);
                             if (Number(val.dayOfWeekPeriodicity) >= startWeekDay) {
-                                dates.push(set(addWeeks(addDays(startOfWeek(date), Number(val.dayOfWeekPeriodicity.split('/')[0])), val.weekDayNumber - 1), { hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }));
+                                dates.push(
+                                    set(
+                                        addWeeks(
+                                            addDays(
+                                                startOfWeek(date),
+                                                Number(val.dayOfWeekPeriodicity.split('/')[0])
+                                            ),
+                                            val.weekDayNumber - 1
+                                        ),
+                                        { hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }
+                                    )
+                                );
                             } else {
-                                dates.push(set(addWeeks(addDays(startOfWeek(date), Number(val.dayOfWeekPeriodicity.split('/')[0]) + 7), val.weekDayNumber - 1), { hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }));
+                                dates.push(
+                                    set(
+                                        addWeeks(
+                                            addDays(
+                                                startOfWeek(date),
+                                                Number(val.dayOfWeekPeriodicity.split('/')[0]) + 7
+                                            ),
+                                            val.weekDayNumber - 1
+                                        ),
+                                        { hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }
+                                    )
+                                );
                             }
 
                         }
@@ -143,7 +178,12 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
                     const yearStarts = eachYearOfInterval({ start: new Date(val.time), end: new Date(loadedMonths!.end!) });
                     yearStarts.forEach((date, i) => {
                         if (i % step === 0) {
-                            dates.push(set(date, { month: Number(val.monthPeriodicity)-1, date: Number(val.dayPeriodicity), hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }));
+                            dates.push(
+                                set(
+                                    date,
+                                    { month: Number(val.monthPeriodicity) - 1, date: Number(val.dayPeriodicity), hours: getHours(new Date(val.time)), minutes: getMinutes(new Date(val.time)) }
+                                )
+                            );
                         }
                     })
                     break;

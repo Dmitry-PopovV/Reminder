@@ -19,7 +19,7 @@ function getInitialMonths() {
 }
 
 function addStartProperty(arr: { id: string; title: string; message: string; time: string; }[]): OneTimeEvent[] {
-    return Array.from(arr, (val) => { return { ...val, start: format(new Date(val.time), "y-M-dd") } })
+    return Array.from(arr, (val) => { return { ...val, start: format(new Date(val.time), "y-MM-dd") } })
 }
 
 type GetRes = {
@@ -80,7 +80,6 @@ export function useEvents() {
                     start: months[0].toISOString().split('T')[0],
                     end: months[1].toISOString().split('T')[0]
                 }))
-                //console.log("new months:", months);
             });
     }
 

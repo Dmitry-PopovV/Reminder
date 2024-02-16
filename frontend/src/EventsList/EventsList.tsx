@@ -15,9 +15,29 @@ import addDays from 'date-fns/addDays';
 import isSameDay from 'date-fns/isSameDay';
 import { Select } from "../types/Select";
 import { useEvents } from '../hooks/useEvents';
+import { RepetitiveEvent } from '../store/slicers/eventsSlice';
+
+function isEventOnThisDay(event: RepetitiveEvent, date: string) {
+    const splitedDate = date.split('-');
+    return (
+        (
+            (event.monthPeriodicity === '*' || Number(event.monthPeriodicity) === Number(splitedDate[1]) - 1)
+            && (event.dayPeriodicity === '*' || Number(event.dayPeriodicity) === Number(splitedDate[2]))
+        )
+        || (event.dayPeriodicity.match(/^.\/.$/) && (differenceInCalendarDays(new Date(event.time), parse(date, "y-MM-dd", new Date())) % Number(event.dayPeriodicity.split('/')[1]) === 0))
+        || (
+            (event.monthPeriodicity.match(/^.\/.$/) && (differenceInCalendarMonths(new Date(event.time), parse(date, "y-MM-dd", new Date())) % Number(event.monthPeriodicity.split('/')[1]) === 0))
+            && (
+                Number(event.dayPeriodicity) === Number(splitedDate[2]) || (
+                    Number(event.dayOfWeekPeriodicity) === getDay(parse(date, "y-MM-dd", new Date())) && (isSameDay(parse(date, "y-MM-dd", new Date()), addDays(startOfWeek(startOfMonth(parse(date, "y-MM-dd", new Date()))), Number(event.dayOfWeekPeriodicity) + 7 * (Number(event.weekDayNumber) - (getDay(startOfMonth(parse(date, "y-MM-dd", new Date()))) > Number(event.dayOfWeekPeriodicity) ? 0 : 1)))))
+                )
+            )
+        )
+    ) && (event.yearPeriodicity === '*' || (event.yearPeriodicity.match(/^.\/.$/) && (differenceInCalendarYears(new Date(event.time), parse(date, "y-MM-dd", new Date())) % Number(event.yearPeriodicity.split('/')[1]) === 0)));
+}
 
 export default function EventsList() {
-    const [select, setSelect] = useOutletContext<[Select, (param: Select) => void]>();
+    const { select, setSelect } = useOutletContext<{ select: Select, setSelect: (param: Select) => void }>();
     const { events } = useEvents();
 
     let list: JSX.Element[] = [];
@@ -38,46 +58,53 @@ export default function EventsList() {
         const month = `${splitedDate[0]}-${splitedDate[1]}`;
 
         const oneTimeEvents = events.oneTimeEvents[month] ? events.oneTimeEvents[month].filter((event) => { return event.start === select.date }) : [];
-        const repetitiveEvents = events.repetitiveEvents.filter((event) => {
-            return (
-                (
-                    (event.monthPeriodicity === '*' || Number(event.monthPeriodicity) === Number(splitedDate[1]) - 1)
-                    && (event.dayPeriodicity === '*' || Number(event.dayPeriodicity) === Number(splitedDate[2]))
-                )
-                || (event.dayPeriodicity.match(/^.\/.$/) && (differenceInCalendarDays(new Date(event.time), parse(select.date, "y-MM-dd", new Date())) % Number(event.dayPeriodicity.split('/')[1]) === 0))
-                || (
-                    (event.monthPeriodicity.match(/^.\/.$/) && (differenceInCalendarMonths(new Date(event.time), parse(select.date, "y-MM-dd", new Date())) % Number(event.monthPeriodicity.split('/')[1]) === 0))
-                    && (
-                        Number(event.dayPeriodicity) === Number(splitedDate[2]) || (
-                            Number(event.dayOfWeekPeriodicity) === getDay(parse(select.date, "y-MM-dd", new Date())) && (isSameDay(parse(select.date, "y-MM-dd", new Date()), addDays(startOfWeek(startOfMonth(parse(select.date, "y-MM-dd", new Date()))), Number(event.dayOfWeekPeriodicity) + 7 * (Number(event.weekDayNumber) - (getDay(startOfMonth(parse(select.date, "y-MM-dd", new Date()))) > Number(event.dayOfWeekPeriodicity) ? 0 : 1)))))
-                        )
-                    )
-                )
-            ) && (event.yearPeriodicity === '*' || (event.yearPeriodicity.match(/^.\/.$/) && (differenceInCalendarYears(new Date(event.time), parse(select.date, "y-MM-dd", new Date())) % Number(event.yearPeriodicity.split('/')[1]) === 0)));
-        });
+        const repetitiveEvents = events.repetitiveEvents.filter((event) => isEventOnThisDay(event, select.date));
 
         for (let i = 0; i < oneTimeEvents.length; i++) {
-            list.push(<Button className='w-100' variant='primary' key={i} onClick={onClick(oneTimeEvents[i].id)} >{`${oneTimeEvents[i].title}: ${format(new Date(oneTimeEvents[i].time), "HH:mm")}`}</Button>)
+            list.push(
+                <Button
+                    className='w-100'
+                    variant='primary'
+                    key={i}
+                    onClick={onClick(oneTimeEvents[i].id)}
+                >
+                    {`${oneTimeEvents[i].title}: ${format(new Date(oneTimeEvents[i].time), "HH:mm")}`}
+                </Button>
+            )
         }
         for (let i = 0; i < repetitiveEvents.length; i++) {
-            list.push(<Button className='w-100' variant='success' key={i + "r"} onClick={onClick(repetitiveEvents[i].id)}>{`${repetitiveEvents[i].title}: ${format(new Date(repetitiveEvents[i].time), "HH:mm")}`}</Button>)
+            list.push(
+                <Button
+                    className='w-100'
+                    variant='success'
+                    key={i + "r"}
+                    onClick={onClick(repetitiveEvents[i].id)}
+                >
+                    {`${repetitiveEvents[i].title}: ${format(new Date(repetitiveEvents[i].time), "HH:mm")}`}
+                </Button>
+            )
         }
     }
 
 
     if (!events || select.view === "noSelection") {
         return (<></>);
-    } else if (select.view === "redactor") {
-        return (<Navigate to={"/calendar/redactor"} />);
-    } else {
-        return (
-            <Container fluid>
-                <Row xs={1} className='gy-1'>
-                    {list}
-                    <Button className='w-100' variant='secondary' onClick={onClick('')}>New event</Button>
-                </Row>
-            </Container>
-        )
     }
-
+    if (select.view === "redactor") {
+        return (<Navigate to={"/calendar/redactor"} />);
+    }
+    return (
+        <Container fluid>
+            <Row xs={1} className='gy-1'>
+                {list}
+                <Button
+                    className='w-100'
+                    variant='secondary'
+                    onClick={onClick('')}
+                >
+                    New event
+                </Button>
+            </Row>
+        </Container>
+    )
 }

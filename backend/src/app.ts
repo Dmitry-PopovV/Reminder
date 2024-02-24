@@ -18,7 +18,6 @@ async function main() {
         app
             .use(express.json())
             .use(session({ secret: cookieSecret, cookie: { maxAge: cookieTime, httpOnly: true }, resave: false, saveUninitialized: true }))
-            .use((req, res, next)=>{if(!req.session.user) {req.session.user = {email: 'Dmitry.Popov.2002@gmail.com', fullName: 'Dmitry Popov'}}; next()})
             .use("/api", Routers)
             .use(ErrorMidleware);
         app

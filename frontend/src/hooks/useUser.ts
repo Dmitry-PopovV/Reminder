@@ -9,7 +9,7 @@ export function useUser() {
 
     useEffect(() => {
         if (user === undefined) {
-            axios.post("/api/user")
+            axios.get("/api/user")
                 .then((res) => {
                     setUser(res.data)
                 })

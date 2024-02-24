@@ -10,7 +10,7 @@ export default function Head() {
     const { user, setUser } = useUser();
 
     function logout() {
-        axios.put("api/logout")
+        axios.put("/api/auth/logout")
             .then(() => {
                 setUser(null);
             })

@@ -5,7 +5,7 @@ import subMonths from 'date-fns/subMonths';
 import set from 'date-fns/set';
 import format from 'date-fns/format';
 import { useAppSelector, useAppDispatch } from "../store";
-import { OneTimeEvent, RepetitiveEvent, setEvents, addOneTimeEvents, deleteOneTimeEvent, addRepetitiveEvents, deleteRepetitiveEvent, updateLoadedMonths } from "../store/slicers/eventsSlice"
+import { OneTimeEvent, RepetitiveEvent, setEvents, addOneTimeEvents, deleteAnyEvent, addRepetitiveEvents, updateLoadedMonths } from "../store/slicers/eventsSlice"
 
 function getInitialMonths() {
     const currentMonth = new Date();
@@ -55,20 +55,15 @@ export function useEvents() {
     }, [])
 
     function newEvent(event: OneTimeEvent | RepetitiveEvent) {
-        if (!(event as OneTimeEvent).start) {
+        if ((event as OneTimeEvent).start) {
             dispatch(addOneTimeEvents([event as OneTimeEvent]));
         } else {
             dispatch(addRepetitiveEvents([event as RepetitiveEvent]));
         }
     }
 
-    function deleteEvent(id: string, month?: string) {
-        if (month) {
-            dispatch(deleteOneTimeEvent({ month, id }));
-        } else {
-            dispatch(deleteRepetitiveEvent(id));
-        }
-
+    function deleteEvent(id: string) {
+        dispatch(deleteAnyEvent(id));
     }
 
     function newMonths(months: Date[]) {

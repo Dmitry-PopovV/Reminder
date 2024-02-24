@@ -20,12 +20,13 @@ type returnedEvents = {
     }[]
 }
 
-export async function findEvents(months: string[]) {
+export async function findEvents(months: string[], email: string) {
     const searchStart = new Date(months[0]);
     const searchEnd = new Date(months[1]);
     const events: Events[] = await Events
         .query(
-            `SELECT * FROM "events" WHERE "events"."eventDate" BETWEEN $1 AND $2
+            `SELECT * FROM "events" WHERE "events"."emailEmail" = $3 AND 
+                ("events"."eventDate" BETWEEN $1 AND $2
                 OR "events"."monthPeriodicity" = '*'
                 OR (
                     POSITION('/' IN "events"."monthPeriodicity") != 0 AND
@@ -33,21 +34,34 @@ export async function findEvents(months: string[]) {
                         WHEN getMonth($1) < getMonth($2) THEN
                             getMonth($1)
                             - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity"))
-			                + getMonthPeriodicity("events"."monthPeriodicity")
+                            + getMonthPeriodicity("events"."monthPeriodicity")
                             BETWEEN getMonth($1) AND getMonth($2)
                         WHEN getMonth($1) >= getMonth($2) THEN
                             getMonth($1)
                             - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity"))
-			                + getMonthPeriodicity("events"."monthPeriodicity")
-                            BETWEEN getMonth($1) AND getMonth($2) + 12
+                            + getMonthPeriodicity("events"."monthPeriodicity")
+                            > getMonth($1)
+                            OR getMonth($1)
+                            - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity"))
+                            + getMonthPeriodicity("events"."monthPeriodicity")
+                            < getMonth($2)
                     END
                 )
                 OR (
-                    POSITION('/' IN "events"."monthPeriodicity") = 0 AND
-                    CAST("events"."monthPeriodicity" AS double precision)
-                    BETWEEN getMonth($1) AND getMonth($2)
-                )`
-            , [searchStart, searchEnd]);
+                    CASE
+                        WHEN getMonth($1) < getMonth($2) THEN
+                            POSITION('/' IN "events"."monthPeriodicity") = 0 AND
+                            CAST("events"."monthPeriodicity" AS double precision)
+                            BETWEEN getMonth($1) AND getMonth($2)
+                        WHEN getMonth($1) >= getMonth($2) THEN
+                            POSITION('/' IN "events"."monthPeriodicity") = 0 AND
+                            (
+                                CAST("events"."monthPeriodicity" AS double precision) > getMonth($1)
+                                OR CAST("events"."monthPeriodicity" AS double precision) < getMonth($2)
+                            )
+                    END
+                ))`
+            , [searchStart, searchEnd, email]);
     let res: returnedEvents = { oneTimeEvents: [], repetitiveEvents: [] };
     events.forEach((val) => {
         if (val.eventDate) {
@@ -66,12 +80,12 @@ export async function findEvents(months: string[]) {
                     id: val.id,
                     title: val.title,
                     message: val.message,
-                    time: val.time.toISOString(),
-                    dayPeriodicity: val.dayPeriodicity,
-                    monthPeriodicity: val.monthPeriodicity,
-                    yearPeriodicity: val.yearPeriodicity,
-                    dayOfWeekPeriodicity: val.dayOfWeekPeriodicity,
-                    weekDayNumber: val.weekDayNumber
+                    time: val.time!.toISOString(),
+                    dayPeriodicity: val.dayPeriodicity as string,
+                    monthPeriodicity: val.monthPeriodicity as string,
+                    yearPeriodicity: val.yearPeriodicity as string,
+                    dayOfWeekPeriodicity: val.dayOfWeekPeriodicity as string,
+                    weekDayNumber: val.weekDayNumber as number
                 });
         }
     })

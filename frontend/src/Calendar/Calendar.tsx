@@ -220,7 +220,7 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
                                 set(
                                     date,
                                     {
-                                        month: Number(val.monthPeriodicity) - 1,
+                                        month: Number(val.monthPeriodicity),
                                         date: Number(val.dayPeriodicity),
                                         hours: getHours(new Date(val.time)),
                                         minutes: getMinutes(new Date(val.time))

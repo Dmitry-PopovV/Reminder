@@ -13,6 +13,7 @@ import subWeeks from 'date-fns/subWeeks';
 import getDay from 'date-fns/getDay';
 import getDate from 'date-fns/getDate';
 import getMonth from 'date-fns/getMonth';
+import axios from 'axios';
 import { Select } from "../types/Select";
 import { useEvents } from '../hooks/useEvents';
 import { OneTimeEvent, RepetitiveEvent } from '../store/slicers/eventsSlice';
@@ -37,7 +38,7 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
     const repeatPeriodRef = useRef<HTMLSelectElement>(null);
 
 
-    function onExitClick() {
+    function onExit() {
         if (select.date) {
             setSelect({
                 view: "day",
@@ -238,8 +239,54 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
         return (event as RepetitiveEvent).dayPeriodicity.split('/')[1];
     }
 
-    function onSave() {//work in progress
-        console.log(event);
+    type Body = {
+        eventDate: string;
+        id: string;
+        title: string;
+        message: string;
+        start: string;
+        time?: string;
+    } | {
+        eventDate: string;
+        id: string;
+        title: string;
+        message: string;
+        time: string;
+        dayPeriodicity: string;
+        monthPeriodicity: string;
+        yearPeriodicity: string;
+        dayOfWeekPeriodicity: string;
+        weekDayNumber: number;
+    }
+
+    function onSave() {
+        const eventDate = (event as OneTimeEvent).start ? (event as OneTimeEvent).start + 'T' + event.time.split('T')[1] : (event as OneTimeEvent).start;
+        const body: Body = { ...event, eventDate };
+        if (body.eventDate !== null && body.eventDate !== undefined) {
+            delete body.time;
+        }
+        axios.post<string>("/api/events", body)
+            .then((res) => {
+                if (event.id === '') {
+                    event.id = res.data;
+                    newEvent(event);
+                } else {
+                    deleteEvent(event.id);
+                    newEvent(event);
+                }
+            });
+    }
+
+    function onDelete() {
+        axios.delete("/api/events", { data: { id: event.id } })
+            .then(() => {
+                deleteEvent(event.id);
+                onExit();
+            });
+    }
+
+    function onTestSend() { //work in progress
+
     }
 
     if (select.view !== "redactor") {
@@ -290,7 +337,7 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
     return (
         <div>
             <InputGroup className="mb-3">
-                <Button onClick={onExitClick}>←</Button>
+                <Button onClick={onExit}>←</Button>
                 <Form.Control
                     id="title"
                     as="input"
@@ -335,10 +382,10 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
                 </div>
                 <Row>
                     <Col className='gy-1'>
-                        <Button className='w-100'>Test send</Button>
+                        <Button className='w-100' onClick={onTestSend}>Test send</Button>
                     </Col>
                     <Col className='gy-1'>
-                        <Button className='w-100' variant='danger'>Delete</Button>
+                        <Button className='w-100' variant='danger' onClick={onDelete}>Delete</Button>
                     </Col>
                 </Row>
             </div>

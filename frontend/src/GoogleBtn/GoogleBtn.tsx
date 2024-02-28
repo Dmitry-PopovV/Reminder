@@ -20,7 +20,7 @@ export default function GoogleBtn() {
                 params[decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
             });
 
-            axios.post('/api/registration', params)
+            axios.post('/api/auth/registration', params)
                 .then((res) => {
                     setUser(res.data);
                 })

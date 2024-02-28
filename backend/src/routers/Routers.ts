@@ -7,9 +7,9 @@ import { EventsRouter } from "../events/EventsRouter";
 const Routers = Router();
 
 Routers
-    .use("/", AuthRouter)
+    .use("/auth", AuthRouter)
     .use("/", AuthorizationMidleware)
-    .use("/", UserRouter)
-    .use("/", EventsRouter);
+    .use("/user", UserRouter)
+    .use("/events", EventsRouter);
 
 export default Routers;

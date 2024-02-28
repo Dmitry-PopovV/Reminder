@@ -16,23 +16,23 @@ export class Events extends BaseEntity {
     message: string
 
     @Column({ nullable: true, type: "timestamp with time zone" })
-    eventDate: Date
+    eventDate: Date | null
 
     @Column({ nullable: true, type: "timestamp with time zone" })
-    time: Date
+    time: Date | null
 
-    @Column({ nullable: true })
-    dayPeriodicity: string
+    @Column({ nullable: true, type: "character varying" })
+    dayPeriodicity: string | null
 
-    @Column({ nullable: true })
-    monthPeriodicity: string
+    @Column({ nullable: true, type: "character varying" })
+    monthPeriodicity: string | null
 
-    @Column({ nullable: true })
-    yearPeriodicity: string
+    @Column({ nullable: true, type: "character varying" })
+    yearPeriodicity: string | null
 
-    @Column({ nullable: true })
-    dayOfWeekPeriodicity: string
+    @Column({ nullable: true, type: "character varying" })
+    dayOfWeekPeriodicity: string | null
     
-    @Column({ nullable: true })
-    weekDayNumber: number
+    @Column({ nullable: true, type: "integer" })
+    weekDayNumber: number | null
 }

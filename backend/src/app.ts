@@ -18,9 +18,6 @@ async function main() {
         app
             .use(express.json())
             .use(session({ secret: cookieSecret, cookie: { maxAge: cookieTime, httpOnly: true }, resave: false, saveUninitialized: true }))
-            .get('/', (req, res) => {
-                res.send('Hello World!');
-            })
             .use("/api", Routers)
             .use(ErrorMidleware);
         app

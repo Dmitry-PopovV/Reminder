@@ -33,17 +33,17 @@ export async function findEvents(months: string[], email: string) {
                     CASE
                         WHEN getMonth($1) < getMonth($2) THEN
                             getMonth($1)
-                            - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity"))
-                            + getMonthPeriodicity("events"."monthPeriodicity")
+                            - MOD(getMonth($1), getPeriodicity("events"."monthPeriodicity"))
+                            + getPeriodicity("events"."monthPeriodicity")
                             BETWEEN getMonth($1) AND getMonth($2)
                         WHEN getMonth($1) >= getMonth($2) THEN
                             getMonth($1)
-                            - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity"))
-                            + getMonthPeriodicity("events"."monthPeriodicity")
+                            - MOD(getMonth($1), getPeriodicity("events"."monthPeriodicity"))
+                            + getPeriodicity("events"."monthPeriodicity")
                             > getMonth($1)
                             OR getMonth($1)
-                            - MOD(getMonth($1), getMonthPeriodicity("events"."monthPeriodicity"))
-                            + getMonthPeriodicity("events"."monthPeriodicity")
+                            - MOD(getMonth($1), getPeriodicity("events"."monthPeriodicity"))
+                            + getPeriodicity("events"."monthPeriodicity")
                             < getMonth($2)
                     END
                 )

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { sendUserController } from "./controllers/sendUserController";
+import { getUserController } from "./controllers/getUserController";
 
 export const UserRouter = Router();
 
 UserRouter
-    .get("/", sendUserController);
+    .get("/", getUserController);

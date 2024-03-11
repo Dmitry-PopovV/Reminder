@@ -1,4 +1,4 @@
-import { ValidateIf, IsUUID, Length, IsISO8601, Matches, IsInt, Max, Min } from "class-validator"
+import { ValidateIf, IsOptional, IsUUID, Length, IsISO8601, Matches, IsInt, Max, Min } from "class-validator"
 
 const periodicityRegExp = /(^[\*0-9]\/[1-9][0-9]?$)|(^\*$)|(^[1-9][0-9]?$)/;
 
@@ -13,31 +13,31 @@ export class saveEventDto {
     @Length(0, 100)
     message: string
 
-    @ValidateIf(dto => dto.eventDate !== undefined)
+    @IsOptional()
     @IsISO8601()
     eventDate: string
 
-    @ValidateIf(dto => dto.time !== undefined)
+    @IsOptional()
     @IsISO8601()
     time: string
 
-    @ValidateIf(dto => dto.dayPeriodicity !== undefined)
+    @IsOptional()
     @Matches(periodicityRegExp)
     dayPeriodicity: string
 
-    @ValidateIf(dto => dto.monthPeriodicity !== undefined)
+    @IsOptional()
     @Matches(periodicityRegExp)
     monthPeriodicity: string
 
-    @ValidateIf(dto => dto.yearPeriodicity !== undefined)
+    @IsOptional()
     @Matches(periodicityRegExp)
     yearPeriodicity: string
 
-    @ValidateIf(dto => dto.dayOfWeekPeriodicity !== undefined)
+    @IsOptional()
     @Matches(periodicityRegExp)
     dayOfWeekPeriodicity: string
     
-    @ValidateIf(dto => dto.weekDayNumber !== undefined)
+    @IsOptional()
     @IsInt()
     @Min(0)
     @Max(31)

@@ -24,8 +24,8 @@ function isEventOnThisDay(event: RepetitiveEvent, date: string) {
     const splitedDate = date.split('-');
     const parsedDate = parse(date, "y-MM-dd", new Date());
 
-    const isMonthCorrectNumberOrAny = Number(event.monthPeriodicity) === Number(splitedDate[1]) - 1;
-    const isDayCorrectNumberOrAny = Number(event.dayPeriodicity) === Number(splitedDate[2]);
+    const isMonthCorrectNumber = Number(event.monthPeriodicity) === Number(splitedDate[1]) - 1;
+    const isDayCorrectNumber = Number(event.dayPeriodicity) === Number(splitedDate[2]);
 
     const isDayPeriod = event.dayPeriodicity.match(/^.\/.$/);
     const doesDayPeriodMatch = differenceInCalendarDays(new Date(event.time), parsedDate) % Number(event.dayPeriodicity.split('/')[1]) === 0;
@@ -36,7 +36,6 @@ function isEventOnThisDay(event: RepetitiveEvent, date: string) {
     const isMonthPeriod = event.monthPeriodicity.match(/^.\/.$/);
     const doesMonthPeriodMatch = differenceInCalendarMonths(new Date(event.time), parsedDate) % Number(event.monthPeriodicity.split('/')[1]) === 0;
 
-    const isDayCorrectNumber = Number(event.dayPeriodicity) === Number(splitedDate[2]);
     const isDayOfWeekCorrectNumber = Number(event.dayOfWeekPeriodicity.split('/')[0]) === getDay(parsedDate);
     const isDayOfWeekThisDay = isSameDay(parsedDate, addDays(startOfWeek(startOfMonth(parsedDate)), Number(event.dayOfWeekPeriodicity) + 7 * (Number(event.weekDayNumber) - (getDay(startOfMonth(parsedDate)) > Number(event.dayOfWeekPeriodicity) ? 0 : 1))));
 
@@ -46,7 +45,7 @@ function isEventOnThisDay(event: RepetitiveEvent, date: string) {
 
     const isAfterCreation = isBefore(new Date(event.time), parsedDate) || isSameDay(new Date(event.time), parsedDate);
     return (
-        (isMonthCorrectNumberOrAny && isDayCorrectNumberOrAny)
+        (isMonthCorrectNumber && isDayCorrectNumber)
         || (isDayPeriod && doesDayPeriodMatch)
         || (isWeekPeriod && doesWeekPeriodMatch && isDayOfWeekCorrectNumber)
         || (

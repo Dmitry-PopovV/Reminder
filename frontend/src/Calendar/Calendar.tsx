@@ -82,6 +82,10 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
             date: arg.dateStr,
             eventID: null
         })
+        setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 400);
+
     }
 
     function onEventClick(arg: any) {
@@ -91,6 +95,9 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
             eventID: arg.event.id,
             isNew: true
         })
+        setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 400);
     }
 
     function toCalendarEvents(events: AllEvents, calendarStart: Date, calendarEnd: Date) {

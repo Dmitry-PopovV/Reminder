@@ -114,7 +114,7 @@ export default function EventsList() {
         return (<Navigate to={"/calendar/redactor"} />);
     }
     return (
-        <Container fluid>
+        <Container fluid className="mb-3">
             <Alert variant="light" className="text-center">
                 {select.date}
             </Alert>

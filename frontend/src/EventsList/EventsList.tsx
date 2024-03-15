@@ -19,6 +19,7 @@ import isBefore from 'date-fns/isBefore';;
 import { Select } from "../types/Select";
 import { useEvents } from '../hooks/useEvents';
 import { RepetitiveEvent } from '../store/slicers/eventsSlice';
+import { useScrollDown } from '../hooks/useScrollDown';
 
 function isEventOnThisDay(event: RepetitiveEvent, date: string) {
     const splitedDate = date.split('-');
@@ -59,6 +60,7 @@ function isEventOnThisDay(event: RepetitiveEvent, date: string) {
 export default function EventsList() {
     const { select, setSelect } = useOutletContext<{ select: Select, setSelect: (param: Select) => void }>();
     const { events } = useEvents();
+    useScrollDown(select);
 
     let list: JSX.Element[] = [];
 

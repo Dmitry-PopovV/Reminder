@@ -1,4 +1,4 @@
-import { Events } from "../entity/Events";
+import { Event } from "../entity/Event";
 import sgMail from "@sendgrid/mail";
 import logger from "../logger";
 
@@ -11,13 +11,20 @@ type SendedEvent = {
     id: string;
     title: string;
     message: string;
-    emailEmail: string;
+    userEmail: string;
+}
+
+type RightResponseError = Omit<sgMail.ResponseError, "response"> & {
+    response: {
+        headers: { [key: string]: string }
+        body: { errors: string[] }
+    }
 }
 
 async function send(event: SendedEvent) {
     try {
         await sgMail.send({
-            to: event.emailEmail,
+            to: event.userEmail,
             from: {
                 email: 'noreply@reminder.dmitryapps.cc',
                 name: "Reminder"
@@ -26,45 +33,45 @@ async function send(event: SendedEvent) {
             text: event.message,
             html: event.message,
         });
-    } catch (err: any) {
+    } catch (err) {
         logger.log({
             level: 'error',
-            message: `Email (id: ${event.id}) sending failed. ${err.response ? err.response.body.errors : err}`
+            message: `Email (id: ${event.id}) sending failed. ${(err as RightResponseError).response ? (err as RightResponseError).response.body.errors : err}`
         });
         throw err;
     }
 }
 
 export default async function sendEventEmail() {
-    const events: SendedEvent[] = await Events
-        .query(`SELECT * FROM "events"
-        WHERE date_trunc('minute', "events"."eventDate") = date_trunc('minute', transaction_timestamp())
+    const events: SendedEvent[] = await Event
+        .query(`SELECT * FROM "event"
+        WHERE date_trunc('minute', "event"."eventDate") = date_trunc('minute', transaction_timestamp())
         OR (
-            date_trunc('minute', transaction_timestamp()) >= date_trunc('minute', "events"."time") AND
-            CAST(date_trunc('minute', transaction_timestamp()) AS TIME) = CAST(date_trunc('minute', "events"."time") AS TIME) AND (
-                doesPeriodMatch('day', "events"."dayPeriodicity", "events"."time", transaction_timestamp())
+            date_trunc('minute', transaction_timestamp()) >= date_trunc('minute', "event"."time") AND
+            CAST(date_trunc('minute', transaction_timestamp()) AS TIME) = CAST(date_trunc('minute', "event"."time") AS TIME) AND (
+                doesPeriodMatch('day', "event"."dayPeriodicity", "event"."time", transaction_timestamp())
                 OR (
-                    doesPeriodMatch('week', "events"."dayOfWeekPeriodicity", "events"."time", transaction_timestamp()) AND
-                    getDay(transaction_timestamp()) = getNumber("events"."dayOfWeekPeriodicity")
+                    doesPeriodMatch('week', "event"."dayOfWeekPeriodicity", "event"."time", transaction_timestamp()) AND
+                    getDay(transaction_timestamp()) = getNumber("event"."dayOfWeekPeriodicity")
                 ) OR (
-                    doesPeriodMatch('month', "events"."monthPeriodicity", "events"."time", transaction_timestamp()) AND
+                    doesPeriodMatch('month', "event"."monthPeriodicity", "event"."time", transaction_timestamp()) AND
                     (
                         (
-                            isNumber("events"."dayPeriodicity") AND
-                            getDate(transaction_timestamp()) = CAST("events"."dayPeriodicity" AS integer)
+                            isNumber("event"."dayPeriodicity") AND
+                            getDate(transaction_timestamp()) = CAST("event"."dayPeriodicity" AS integer)
                         ) OR
                         (
-                            isNumber("events"."dayOfWeekPeriodicity") AND
-                            isDayOfWeekThisDay(transaction_timestamp(), "events"."dayOfWeekPeriodicity", "events"."weekDayNumber")
+                            isNumber("event"."dayOfWeekPeriodicity") AND
+                            isDayOfWeekThisDay(transaction_timestamp(), "event"."dayOfWeekPeriodicity", "event"."weekDayNumber")
                         )
                     )
                 ) OR (
-                    doesPeriodMatch('year', "events"."yearPeriodicity", "events"."time", transaction_timestamp()) AND
+                    doesPeriodMatch('year', "event"."yearPeriodicity", "event"."time", transaction_timestamp()) AND
                     (
-                        isNumber("events"."dayPeriodicity") AND
-                        isNumber("events"."monthPeriodicity") AND
-                        getDate(transaction_timestamp()) = CAST("events"."dayPeriodicity" AS integer) AND
-                        getMonth(transaction_timestamp()) = CAST("events"."monthPeriodicity" AS integer) + 1
+                        isNumber("event"."dayPeriodicity") AND
+                        isNumber("event"."monthPeriodicity") AND
+                        getDate(transaction_timestamp()) = CAST("event"."dayPeriodicity" AS integer) AND
+                        getMonth(transaction_timestamp()) = CAST("event"."monthPeriodicity" AS integer) + 1
                     )
                 )
             )
@@ -77,8 +84,8 @@ export default async function sendEventEmail() {
         try {
             await Promise.all(promises);
             console.log("Emails sended: ", events.length);
-        } catch (err: any) {
-            console.log("There is error during email sending: ", err.message);
+        } catch (err) {
+            console.log("There is error during email sending: ", (err as Error).message);
         }
     } else {
         console.log("No emails");

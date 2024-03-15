@@ -19,6 +19,7 @@ import { useEvents } from '../hooks/useEvents';
 import { OneTimeEvent, RepetitiveEvent } from '../store/slicers/eventsSlice';
 import getRepeatPeriod from '../functions/getRepeatPeriod';
 import useSetup from './useSetup';
+import { useScrollDown } from '../hooks/useScrollDown';
 
 
 export default function EventsRedactor() {
@@ -28,6 +29,7 @@ export default function EventsRedactor() {
 
 function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Select) => void }) {
     const { events, newEvent, deleteEvent } = useEvents();
+    useScrollDown(select);
 
     const { isRepetitiveState, isRelatedOnDaysOfWeekState, eventState } = useSetup(events, select);
     const [isRepetitive, setIsRepetitive] = isRepetitiveState;

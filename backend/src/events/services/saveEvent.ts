@@ -1,4 +1,4 @@
-import { Events } from "../../entity/Events";
+import { Event } from "../../entity/Event";
 import { User } from "../../entity/User";
 
 type EventData = {
@@ -19,7 +19,7 @@ function toNullIfUndefined<T>(item: T) {
 }
 
 async function newEvent(eventData: EventData, email: string) {
-    const event = new Events();
+    const event = new Event();
     event.title = eventData.title;
     event.message = eventData.message;
     event.eventDate = eventData.eventDate ? new Date(eventData.eventDate) : null;
@@ -32,18 +32,18 @@ async function newEvent(eventData: EventData, email: string) {
 
     const relation = new User()
     relation.email = email;
-    event.email = relation;
+    event.user = relation;
     await event.save();
     return event.id;
 }
 
 async function updateEvent(eventData: EventData, email: string) {
-    const event = await Events.findOneOrFail({
+    const event = await Event.findOneOrFail({
         where: { id: eventData.id },
-        relations: { email: true }
+        relations: { user: true }
     });
 
-    if (event.email.email !== email) {
+    if (event.user.email !== email) {
         throw new Error("Attempt to access another's event");
     }
 

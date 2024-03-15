@@ -1,7 +1,7 @@
-import { Events } from "../entity/Events";
+import { Event } from "../entity/Event";
 
 export default async function createDBFunctions() {
-    await Events.query(
+    await Event.query(
         `CREATE OR REPLACE FUNCTION getMonth(d timestamp with time zone) returns integer as $$
             SELECT EXTRACT(MONTH FROM d)
         $$ LANGUAGE SQL;

@@ -1,12 +1,12 @@
-import { Events } from "../../entity/Events";
+import { Event } from "../../entity/Event";
 
 export async function deleteEvent(id: string, email: string) {
-    const event = await Events.findOneOrFail({
+    const event = await Event.findOneOrFail({
         where: { id: id },
-        relations: { email: true }
+        relations: { user: true }
     });
 
-    if (event.email.email !== email) {
+    if (event.user.email !== email) {
         throw new Error("Attempt to delete another's event");
     }
 

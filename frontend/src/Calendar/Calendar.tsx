@@ -90,7 +90,7 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
             date: arg.event.startStr,
             eventID: arg.event.id,
             isNew: true
-        })
+        }) 
     }
 
     function toCalendarEvents(events: AllEvents, calendarStart: Date, calendarEnd: Date) {

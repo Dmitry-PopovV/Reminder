@@ -1,4 +1,4 @@
-import { Events } from "../../entity/Events";
+import { Event } from "../../entity/Event";
 
 type returnedEvents = {
     oneTimeEvents: {
@@ -23,41 +23,41 @@ type returnedEvents = {
 export async function findEvents(months: string[], email: string) {
     const searchStart = new Date(months[0]);
     const searchEnd = new Date(months[1]);
-    const events: Events[] = await Events
+    const events: Event[] = await Event
         .query(
-            `SELECT * FROM "events" WHERE "events"."emailEmail" = $3 AND 
-                ("events"."eventDate" BETWEEN $1 AND $2
-                OR "events"."monthPeriodicity" = '*'
+            `SELECT * FROM "event" WHERE "event"."userEmail" = $3 AND 
+                ("event"."eventDate" BETWEEN $1 AND $2
+                OR "event"."monthPeriodicity" = '*'
                 OR (
-                    POSITION('/' IN "events"."monthPeriodicity") != 0 AND
+                    POSITION('/' IN "event"."monthPeriodicity") != 0 AND
                     CASE
                         WHEN getMonth($1) < getMonth($2) THEN
                             getMonth($1)
-                            - MOD(getMonth($1), getPeriodicity("events"."monthPeriodicity"))
-                            + getPeriodicity("events"."monthPeriodicity")
+                            - MOD(getMonth($1), getPeriodicity("event"."monthPeriodicity"))
+                            + getPeriodicity("event"."monthPeriodicity")
                             BETWEEN getMonth($1) AND getMonth($2)
                         WHEN getMonth($1) >= getMonth($2) THEN
                             getMonth($1)
-                            - MOD(getMonth($1), getPeriodicity("events"."monthPeriodicity"))
-                            + getPeriodicity("events"."monthPeriodicity")
+                            - MOD(getMonth($1), getPeriodicity("event"."monthPeriodicity"))
+                            + getPeriodicity("event"."monthPeriodicity")
                             > getMonth($1)
                             OR getMonth($1)
-                            - MOD(getMonth($1), getPeriodicity("events"."monthPeriodicity"))
-                            + getPeriodicity("events"."monthPeriodicity")
+                            - MOD(getMonth($1), getPeriodicity("event"."monthPeriodicity"))
+                            + getPeriodicity("event"."monthPeriodicity")
                             < getMonth($2)
                     END
                 )
                 OR (
                     CASE
                         WHEN getMonth($1) < getMonth($2) THEN
-                            POSITION('/' IN "events"."monthPeriodicity") = 0 AND
-                            CAST("events"."monthPeriodicity" AS double precision)
+                            POSITION('/' IN "event"."monthPeriodicity") = 0 AND
+                            CAST("event"."monthPeriodicity" AS double precision)
                             BETWEEN getMonth($1) AND getMonth($2)
                         WHEN getMonth($1) >= getMonth($2) THEN
-                            POSITION('/' IN "events"."monthPeriodicity") = 0 AND
+                            POSITION('/' IN "event"."monthPeriodicity") = 0 AND
                             (
-                                CAST("events"."monthPeriodicity" AS double precision) > getMonth($1)
-                                OR CAST("events"."monthPeriodicity" AS double precision) < getMonth($2)
+                                CAST("event"."monthPeriodicity" AS double precision) > getMonth($1)
+                                OR CAST("event"."monthPeriodicity" AS double precision) < getMonth($2)
                             )
                     END
                 ))`

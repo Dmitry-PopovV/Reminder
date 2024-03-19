@@ -2,12 +2,12 @@ import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne } from "t
 import { User } from "./User";
 
 @Entity()
-export class Events extends BaseEntity {
+export class Event extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
     @ManyToOne(()=> User, (user)=>user.events)
-    email: User
+    user: User
 
     @Column()
     title: string

@@ -12,9 +12,9 @@ export default function Layout() {
     const [select, setSelect] = useState<Select>({ view: "noSelection", date: null, eventID: null })
 
     return (
-        <div>
+        <>
             <Head />
-            <Container fluid>
+            <Container fluid className="mt-4 px-5">
                 <Row xs={1} md={2}>
                     <Col className="gy-1">
                         <Calendar setSelect={setSelect} />
@@ -24,6 +24,6 @@ export default function Layout() {
                     </Col>
                 </Row>
             </Container>
-        </div>
+        </>
     );
 }

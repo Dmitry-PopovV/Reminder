@@ -332,6 +332,8 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
             </InputGroup>
         </> : null;
 
+    const cancelOrDeleteButton = event.id === '' ? <Button className='w-100' variant='outline-secondary' onClick={onExit}>Cancel</Button> : <Button className='w-100' variant='danger' onClick={onDelete}>Delete</Button>;
+
     return (
         <div>
             <InputGroup className="mb-3">
@@ -380,7 +382,7 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
                         <Button className='w-100' onClick={onSave}>Save</Button>
                     </Col>
                     <Col className='gy-1'>
-                        <Button className='w-100' variant='danger' onClick={onDelete}>Delete</Button>
+                        {cancelOrDeleteButton}
                     </Col>
                 </Row>
             </div>

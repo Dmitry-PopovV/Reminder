@@ -18,11 +18,12 @@ async function main() {
         app
             .use(express.json())
             .use(session({ secret: cookieSecret, cookie: { maxAge: cookieTime, httpOnly: true }, resave: false, saveUninitialized: true }))
+            .use(express.static(__dirname + "/static"))
             .use("/api", Routers)
             .use(ErrorMidleware);
         app
             .listen(port, () => {
-                console.log(`Example app listening on port ${port}`);
+                console.log(`App listening on port ${port}`);
             });
     } catch (err) {
         console.log("Fatal error:\n", err);

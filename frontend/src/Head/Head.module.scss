@@ -2,6 +2,36 @@
     background-color: lightblue;
 }
 
-.logout_button {
-    height: 90%;
+.center {
+    display: flex;
+    align-items: center;
+}
+
+.logoImg {
+    @media (min-width: 600px) {
+        width: 48px;
+        height: 48px;
+    }
+
+    @media (max-width: 600px) {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.logoTitle {
+    @media (min-width: 600px) {
+        font-size: 25px;
+    }
+
+    font-weight: 500;
+}
+
+.login {
+    margin-right: 4px;
+
+    @media (max-width: 600px) {
+        font-size: 9px;
+        display: none;
+    }
 }

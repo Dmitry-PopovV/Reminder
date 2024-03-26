@@ -17,15 +17,16 @@ export default function Head() {
     }
 
     return (
-        <div className={style.container}>
-            <Row className="m-0">
-                <Col xs="auto" md="auto">
-                    Reminder
+        <div className={style.container + " px-5"}>
+            <Row className="m-0 justify-content-end">
+                <Col xs="auto" md="auto" className={style.center}>
+                    <img src="/ReminderLogo512.png" className={style.logoImg + " me-3"} />
+                    <span className={style.logoTitle}>Reminder</span>
                 </Col>
                 <Col></Col>
-                <Col xs="auto" md="auto">
-                    <span id="user_name">{user?.email}</span>
-                    <Button variant="light" className={style.logout_button} onClick={logout}>logout</Button>
+                <Col xs="auto" md="auto" className={style.center}>
+                    <span id="user_name" className={style.login}>{user?.email}</span>
+                    <Button variant="secondary" className="btn-sm" onClick={logout}>Log out</Button>
                 </Col>
             </Row>
         </div>

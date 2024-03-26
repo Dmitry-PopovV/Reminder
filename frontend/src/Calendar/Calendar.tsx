@@ -1,3 +1,4 @@
+import style from "./Calendar.module.scss"
 import { useRef } from 'react';
 import { Spinner } from 'react-bootstrap';
 import FullCalendar from '@fullcalendar/react';
@@ -90,7 +91,7 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
             date: arg.event.startStr,
             eventID: arg.event.id,
             isNew: true
-        }) 
+        })
     }
 
     function toCalendarEvents(events: AllEvents, calendarStart: Date, calendarEnd: Date) {
@@ -249,37 +250,39 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
     }
 
     return events ? (
-        <FullCalendar ref={calendarRef}
-            plugins={[dayGridPlugin, interactionPlugin]}
-            height="auto"
-            initialView="dayGridMonth"
-            eventSources={[{ events: (info, callBack) => { callBack(toCalendarEvents(events, info.start, info.end)) } }]}
-            dateClick={onDateClick}
-            eventClick={onEventClick}
-            customButtons={{
-                customNext: {
-                    icon: 'chevron-right',
-                    click: function () {
-                        let calendarApi = calendarRef.current.getApi();
-                        calendarApi.next();
-                        updateMonths(calendarApi.getDate());
+        <div className={style.container}>
+            <FullCalendar ref={calendarRef}
+                plugins={[dayGridPlugin, interactionPlugin]}
+                height="100%"
+                initialView="dayGridMonth"
+                eventSources={[{ events: (info, callBack) => { callBack(toCalendarEvents(events, info.start, info.end)) } }]}
+                dateClick={onDateClick}
+                eventClick={onEventClick}
+                customButtons={{
+                    customNext: {
+                        icon: 'chevron-right',
+                        click: function () {
+                            let calendarApi = calendarRef.current.getApi();
+                            calendarApi.next();
+                            updateMonths(calendarApi.getDate());
+                        }
+                    },
+                    customPrev: {
+                        icon: 'chevron-left',
+                        click: function () {
+                            let calendarApi = calendarRef.current.getApi();
+                            calendarApi.prev();
+                            updateMonths(calendarApi.getDate());
+                        }
                     }
-                },
-                customPrev: {
-                    icon: 'chevron-left',
-                    click: function () {
-                        let calendarApi = calendarRef.current.getApi();
-                        calendarApi.prev();
-                        updateMonths(calendarApi.getDate());
-                    }
-                }
-            }}
-            headerToolbar={{
-                start: 'title',
-                center: '',
-                end: 'customPrev,customNext'
-            }}
-        />) : (
+                }}
+                headerToolbar={{
+                    start: 'title',
+                    center: '',
+                    end: 'customPrev,customNext'
+                }}
+            />
+        </div>) : (
         <Spinner animation="border" />
     );
 }

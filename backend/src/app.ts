@@ -5,10 +5,12 @@ import session from 'express-session';
 import serverInitialize from "./serverInitialize";
 import ErrorMidleware from "./midleware/ErrorMidleware";
 import Routers from "./routers/Routers";
+import { config } from "dotenv";
 
+config({ path: 'src/env/.env' });
 
 const app = express();
-const port = 3000;
+const port = Number(process.env.PORT);
 const cookieTime = 24 * 60 * 60 * 1000;
 
 async function main() {

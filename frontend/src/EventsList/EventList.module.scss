@@ -1,0 +1,9 @@
+.list {
+    border-bottom-style: solid;
+    border-color: gray;
+
+    @media (min-width: 600px) {
+        height: 63vh;
+        overflow-y: auto;
+    }
+}

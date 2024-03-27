@@ -1,23 +1,36 @@
 $BorSty: solid;
 $BorWid: 1px;
-$mar1: 25%;
+$mar1: auto;
 $mar2: auto;
+
+.logo {
+    background-color: rgb(56, 169, 255);
+    border-radius: 4px;
+}
+
+.title {
+    font-size: 40px;
+    font-weight: 500;
+}
+
+.logoAndTitle {
+    display: flex;
+    align-items: center;
+}
+
+.parentContainer {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .container {
     text-align: center;
-    margin: $mar2 $mar1;
     border-style: $BorSty;
     border-width: $BorWid;
     border-radius: 10px;
-    overflow: hidden;
-    position: absolute;
-    top: 40%;
-    width: 50%;
-}
 
-.header {
-    background-color: lightblue;
-    border-bottom-style: $BorSty;
-    border-bottom-width: $BorWid;
-
+    width: auto;
+    padding: 2%;
 }

@@ -79,15 +79,12 @@ export default async function sendEventEmail() {
         `);
 
     if (events.length !== 0) {
-        const promises: Promise<void>[] = [];
-        events.forEach((event) => { promises.push(send(event)) });
+        const sendingsEvents: Promise<void>[] = [];
+        events.forEach((event) => { sendingsEvents.push(send(event)) });
         try {
-            await Promise.all(promises);
-            console.log("Emails sended: ", events.length);
+            await Promise.all(sendingsEvents);
         } catch (err) {
             console.log("There is error during email sending: ", (err as Error).message);
         }
-    } else {
-        console.log("No emails");
     }
 }

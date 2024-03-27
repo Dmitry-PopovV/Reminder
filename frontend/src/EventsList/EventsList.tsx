@@ -1,3 +1,4 @@
+import style from "./EventList.module.scss";
 import { Navigate } from 'react-router';
 import { useOutletContext } from "react-router-dom";
 import Container from "react-bootstrap/Container";
@@ -120,11 +121,15 @@ export default function EventsList() {
             <Alert variant="light" className="text-center">
                 {select.date}
             </Alert>
-            <Row xs={1} className='gy-1'>
-                {list}
+            <Row xs={1} className='gy-2'>
+                <div className={style.list + " pb-3"}>
+                    <Row className="gy-1">
+                        {list}
+                    </Row>
+                </div>
                 <Button
                     className='w-100'
-                    variant='secondary'
+                    variant='outline-secondary'
                     onClick={onClick('')}
                 >
                     New event

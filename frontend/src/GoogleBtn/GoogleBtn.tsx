@@ -34,7 +34,7 @@ export default function GoogleBtn() {
     const login = useGoogleLogin({
         flow: 'auth-code',
         ux_mode: "redirect",
-        redirect_uri: "http://localhost:3001"
+        redirect_uri: import.meta.env.VITE_GOOGLE_AUTH_URL
     });
 
     switch (status) {

@@ -5,7 +5,6 @@
   "main": "src/app.ts",
   "scripts": {
     "dev": "nodemon src/app.ts",
-    "prebuild": "if exist dist rd /s /q dist",
     "build": "npx tsc",
     "prod": "node ./dist/app.js"
   },

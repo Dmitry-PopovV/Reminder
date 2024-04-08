@@ -3,7 +3,7 @@ import { Event } from "../entity/Event";
 export default async function createDBFunctions() {
     await Event.query(
         `CREATE OR REPLACE FUNCTION getMonth(d timestamp with time zone) returns integer as $$
-            SELECT EXTRACT(MONTH FROM d)
+            SELECT CAST(EXTRACT(MONTH FROM d) AS integer)
         $$ LANGUAGE SQL;
         
         CREATE OR REPLACE FUNCTION getPeriodicity(str character varying) returns integer as $$

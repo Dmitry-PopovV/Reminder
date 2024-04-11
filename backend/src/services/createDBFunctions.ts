@@ -3,7 +3,7 @@ import { Event } from "../entity/Event";
 export default async function createDBFunctions() {
     await Event.query(
         `CREATE OR REPLACE FUNCTION getMonth(d timestamp with time zone) returns integer as $$
-            SELECT EXTRACT(MONTH FROM d)
+            SELECT CAST(EXTRACT(MONTH FROM d) AS integer)
         $$ LANGUAGE SQL;
         
         CREATE OR REPLACE FUNCTION getPeriodicity(str character varying) returns integer as $$
@@ -11,14 +11,14 @@ export default async function createDBFunctions() {
         $$ LANGUAGE SQL;
         
         CREATE OR REPLACE FUNCTION getDate(d timestamp with time zone) returns integer as $$
-            SELECT EXTRACT(DAY FROM d)
+            SELECT CAST(EXTRACT(DAY FROM d) AS integer)
         $$ LANGUAGE SQL;
         
         CREATE OR REPLACE FUNCTION difference(per character varying, d1 timestamp with time zone, d2 timestamp with time zone) returns integer as $$
             SELECT CASE WHEN (per = 'week') THEN
-                DATE_PART('day', AGE(d1, d2)) / 7
+                CAST(DATE_PART('day', AGE(d1, d2)) / 7 AS integer)
             ELSE
-                DATE_PART(per, AGE(d1, d2))
+                CAST(DATE_PART(per, AGE(d1, d2)) AS integer)
             END;
         $$ LANGUAGE SQL;
         
@@ -28,7 +28,7 @@ export default async function createDBFunctions() {
         $$ LANGUAGE SQL;
 
         CREATE OR REPLACE FUNCTION getDay(d timestamp with time zone) returns integer as $$
-            SELECT EXTRACT(DOW FROM d)
+            SELECT CAST(EXTRACT(DOW FROM d) AS integer)
         $$ LANGUAGE SQL;
 
         CREATE OR REPLACE FUNCTION isDayOfWeekThisDay(d timestamp with time zone, dowPer character varying, wdNumber integer) returns boolean as $$

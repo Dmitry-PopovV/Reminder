@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "nodemon src/app.ts",
     "build": "npx tsc",
-    "prod": "node ./dist/app.js"
+    "prod": "node ./dist/app.js",
+    "typeorm:create": "typeorm-ts-node-commonjs migration:create",
+    "typeorm:run": "typeorm-ts-node-commonjs migration:run -d ./src/data-source.ts",
+    "typeorm:revert": "typeorm-ts-node-commonjs migration:revert -d ./src/data-source.ts"
   },
   "author": "",
   "license": "ISC",

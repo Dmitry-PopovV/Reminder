@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./User";
 
 @Entity()
@@ -35,4 +35,10 @@ export class Event extends BaseEntity {
     
     @Column({ nullable: true, type: "integer" })
     weekDayNumber: number | null
+
+    @CreateDateColumn({ default: () => 'NOW()' })
+    createdAt: Date
+
+    @UpdateDateColumn()
+    updatedAt: Date
 }

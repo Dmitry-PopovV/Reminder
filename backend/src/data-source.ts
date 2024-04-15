@@ -2,7 +2,7 @@ import { DataSource } from "typeorm";
 import { User } from "./entity/User";
 import { Event } from "./entity/Event";
 import { config } from "dotenv";
-import { Timestamps1712856833231 } from "../migrations/1712856833231-timestamps";
+import { Timestamps1712856833231 } from "./migrations/1712856833231-timestamps";
 
 config({ path: 'src/env/.env' });
 

@@ -11,14 +11,14 @@ export const AppDataSource = new DataSource({
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     username: process.env.DB_USER_NAME,
-    password: process.env.DB_PASWORD,
+    password: process.env.DB_PASSWORD,
     database: process.env.DATABASE,
     synchronize: false,
     logging: false,
     entities: [User, Event],
     subscribers: [],
     migrations: [Timestamps1712856833231],
-    ssl: {
+    ssl: "true" === process.env.DB_SSL ? {
         rejectUnauthorized: false
-    }
+    } : undefined,
 });

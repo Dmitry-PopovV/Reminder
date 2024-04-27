@@ -1,7 +1,7 @@
 import routerPaths from "./routerPaths";
 import { RouterProvider } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { Provider } from "react-redux"
+import { Provider } from "react-redux";
 import { store } from './store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 

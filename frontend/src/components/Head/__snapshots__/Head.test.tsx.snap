@@ -1,0 +1,46 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Head component > snapshot 1`] = `
+<div
+  class="_container_dd69d5 px-5"
+  data-testid="headMainContainer"
+>
+  <div
+    class="m-0 justify-content-end row"
+  >
+    <div
+      class="_center_dd69d5 col-md-auto col-auto"
+    >
+      <img
+        class="_logoImg_dd69d5 me-3"
+        src="/ReminderLogo512.png"
+      />
+      <span
+        class="_logoTitle_dd69d5"
+      >
+        Reminder
+      </span>
+    </div>
+    <div
+      class="col"
+    />
+    <div
+      class="_center_dd69d5 col-md-auto col-auto"
+    >
+      <span
+        class="_login_dd69d5"
+        id="user_name"
+      >
+        test@mail.com
+      </span>
+      <button
+        class="btn-sm btn btn-secondary"
+        data-testid="logoutButton"
+        type="button"
+      >
+        Log out
+      </button>
+    </div>
+  </div>
+</div>
+`;

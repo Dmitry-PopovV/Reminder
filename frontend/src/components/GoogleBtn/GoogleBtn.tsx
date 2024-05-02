@@ -3,7 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import Spinner from 'react-bootstrap/Spinner';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { useUser } from "../hooks/useUser";
+import { useUser } from "../../hooks/useUser";
 
 export default function GoogleBtn() {
     const [status, setStatus] = useState<"OK" | "Loading">("OK");
@@ -12,15 +12,17 @@ export default function GoogleBtn() {
     useEffect(() => {
         const params: any = {};
         const url = document.location.search;
-        if ((url != '') && (status === "OK")) {
-            setStatus("Loading");
-
+        if (url != '') {
             url.replace('?', '').split('&').forEach((str) => {
                 const a = str.split('=');
                 params[decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
             });
+        }
 
-            axios.post('/api/auth/registration', params)
+        if ((params.code !== undefined) && (status === "OK")) {
+            setStatus("Loading");
+
+            axios.post('/api/auth/registration', { code: params.code })
                 .then((res) => {
                     setUser(res.data);
                 })

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import { AllEvents, OneTimeEvent, RepetitiveEvent } from "../store/slicers/eventsSlice";
-import { Select } from "../types/Select";
-import getRepeatPeriod from '../functions/getRepeatPeriod';
+import { AllEvents, OneTimeEvent, RepetitiveEvent } from "../../store/slicers/eventsSlice";
+import { Select } from "../Layout/Layout";
+import getRepeatPeriod from '../../functions/getRepeatPeriod';
 import parse from "date-fns/parse";
 
 

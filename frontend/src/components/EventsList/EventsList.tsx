@@ -17,10 +17,10 @@ import startOfWeek from 'date-fns/startOfWeek';
 import addDays from 'date-fns/addDays';
 import isSameDay from 'date-fns/isSameDay';
 import isBefore from 'date-fns/isBefore';;
-import { Select } from "../types/Select";
-import { useEvents } from '../hooks/useEvents';
-import { RepetitiveEvent } from '../store/slicers/eventsSlice';
-import { useScrollDown } from '../hooks/useScrollDown';
+import { Select } from "../Layout/Layout";
+import { useEvents } from '../../hooks/useEvents';
+import { RepetitiveEvent } from '../../store/slicers/eventsSlice';
+import { useScrollDown } from '../../hooks/useScrollDown';
 
 function isEventOnThisDay(event: RepetitiveEvent, date: string) {
     const splitedDate = date.split('-');
@@ -131,6 +131,7 @@ export default function EventsList() {
                     className='w-100'
                     variant='outline-secondary'
                     onClick={onClick('')}
+                    data-testid="newEventButton"
                 >
                     New event
                 </Button>

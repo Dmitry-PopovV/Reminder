@@ -13,7 +13,7 @@ google.options({ auth: oauth2Client });
 
 const people = google.people('v1');
 
-export async function Registration(code: string) {
+async function registration(code: string) {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
 
@@ -32,4 +32,25 @@ export async function Registration(code: string) {
     } else {
         throw new Error("Google send wrong data");
     }
+}
+
+type TestUsersByCodes = {
+    [key: string]: {
+        email: string,
+        fullName: string
+    }
+}
+
+const testUsersByCodes: TestUsersByCodes = {
+    "1000000000100000000010000000001000000000100000000010000000001000000000100": { email: "test@email.com", fullName: "Test User" }
+}
+
+export async function Registration(code: string) {
+    if(process.env.NODE_ENV === "test") {
+        if(testUsersByCodes[code] !== undefined) {
+            return testUsersByCodes[code];
+        }
+        throw new Error("Code is not in the list(NODE_ENV = test)")
+    }
+    return registration(code);
 }

@@ -1,9 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
-import Layout from "./Layout/Layout.tsx";
-import Landing from "./Landing/Landing.tsx";
-import Authentication from "./Authentication/Authentication";
-import EventsList from "./EventsList/EventsList.tsx";
-import EventsRedactor from "./EventsRedactor/EventsRedactor.tsx";
+import Layout from "./components/Layout/Layout.tsx";
+import Landing from "./components/Landing/Landing.tsx";
+import Authentication from "./components/Authentication/Authentication";
+import EventsList from "./components/EventsList/EventsList.tsx";
+import EventsRedactor from "./components/EventsRedactor/EventsRedactor.tsx";
 
 const routerPaths = createBrowserRouter([
     {

@@ -7,7 +7,9 @@ describe('Landing', () => {
     it('checks image loading', () => {
         cy.mount(
             <Provider store={store}>
-                <GoogleOAuthProvider clientId="1014605016286-6ch6iebr5l3eten2brtv7qr7c76s16jp.apps.googleusercontent.com">
+                <GoogleOAuthProvider
+                    clientId="1014605016286-6ch6iebr5l3eten2brtv7qr7c76s16jp.apps.googleusercontent.com"
+                >
                     <Landing />
                 </GoogleOAuthProvider>
             </Provider>

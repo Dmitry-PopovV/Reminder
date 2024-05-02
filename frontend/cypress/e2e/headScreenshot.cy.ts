@@ -1,6 +1,10 @@
-describe('template spec', () => {
-    it('passes', () => {
+describe('head screenshot', () => {
+    before(() => {
+        cy.login();
+    })
+
+    it('makes screenshot', () => {
         cy.visit('/');
-        cy.get("[data-testid=headMainContainer]").screenshot();
+        cy.getByTestId("headMainContainer").screenshot();
     })
 })

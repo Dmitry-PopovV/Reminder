@@ -1,7 +1,7 @@
 import style from "./Authentication.module.scss"
 import { Navigate, useLocation } from 'react-router';
 import { Outlet } from "react-router-dom";
-import { useUser } from "../hooks/useUser";
+import { useUser } from "../../hooks/useUser";
 import Spinner from 'react-bootstrap/Spinner';
 
 

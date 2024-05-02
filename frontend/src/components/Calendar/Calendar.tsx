@@ -20,10 +20,10 @@ import format from 'date-fns/format';
 import isBefore from 'date-fns/isBefore';
 import isAfter from 'date-fns/isAfter';
 import startOfWeek from 'date-fns/startOfWeek';
-import { useEvents } from '../hooks/useEvents';
-import { Select } from '../types/Select';
-import { AllEvents, OneTimeEvent } from '../store/slicers/eventsSlice';
-import getRepeatPeriod from '../functions/getRepeatPeriod';
+import { useEvents } from '../../hooks/useEvents';
+import { Select } from '../Layout/Layout';
+import { AllEvents, OneTimeEvent } from '../../store/slicers/eventsSlice';
+import getRepeatPeriod from '../../functions/getRepeatPeriod';
 
 const setParams = { milliseconds: 0, seconds: 0, minutes: 0, hours: 0, date: 0 };
 

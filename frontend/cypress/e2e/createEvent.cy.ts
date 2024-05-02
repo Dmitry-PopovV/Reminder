@@ -1,16 +1,20 @@
-describe('template spec', () => {
-    it('passes', () => {
+describe('create event', () => {
+    before(() => {
+        cy.login();
+    })
+
+    it('checks event\'s creation and deletion', () => {
         cy.visit('/');
         cy.get("[role=gridcell]").first().click();
-        cy.contains("New event").click();
+        cy.getByTestId("newEventButton").click();
 
-        cy.get("[value=\"New event\"]").clear().type("test_event");
-        cy.contains("Save").click();
+        cy.getByTestId("titleInput").clear().type("test_event");
+        cy.getByTestId("saveButton").click();
 
         cy.get("[class=\"fc-event-title fc-sticky\"]").contains("test_event");
 
-        cy.contains("Delete").click();
+        cy.getByTestId("deleteButton").click();
 
-        cy.get("[class=\"fc-event-title fc-sticky\"]").contains("test_event").should("not.exist");
+        cy.contains("test_event").should("not.exist");
     })
 })

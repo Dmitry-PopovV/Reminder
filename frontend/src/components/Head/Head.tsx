@@ -3,7 +3,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
-import { useUser } from "../hooks/useUser";
+import { useUser } from "../../hooks/useUser";
 
 
 export default function Head() {

@@ -3,18 +3,14 @@ import { vi } from "vitest";
 import Head from "./Head";
 import { Provider } from "react-redux";
 import axios from "axios";
-import { store } from '../store';
-import { useUser } from "../hooks/useUser";
+import { store } from '../../store';
+import { useUser } from "../../hooks/useUser";
 
 vi.mock("axios");
-vi.mock("../hooks/useUser");
+vi.mock("../../hooks/useUser");
 
-describe("Head", () => {
-    afterEach(()=>{
-        vi.clearAllMocks();
-    })
-
-    test("snapshot", () => {
+describe("Head component", () => {
+    beforeAll(()=>{
         (axios.put as jest.Mock).mockReturnValue(new Promise((res) => {
             res({
                 data: null
@@ -28,7 +24,13 @@ describe("Head", () => {
             },
             setUser
         })
-        
+    })
+
+    afterEach(()=>{
+        vi.clearAllMocks();
+    })
+
+    test("snapshot", () => {
         render(
             <Provider store={store}>
                 <Head />
@@ -39,20 +41,6 @@ describe("Head", () => {
     })
 
     test("logout", () => {
-        (axios.put as jest.Mock).mockReturnValue(new Promise((res) => {
-            res({
-                data: null
-            })
-        }))
-        const setUser = vi.fn();
-        (useUser as jest.Mock).mockReturnValue({
-            user: {
-                email: "example@mail.com",
-                fullName: "Bob Pop"
-            },
-            setUser
-        })
-
         render(
             <Provider store={store}>
                 <Head />

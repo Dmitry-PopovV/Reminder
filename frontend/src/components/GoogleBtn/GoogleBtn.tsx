@@ -3,7 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import Spinner from 'react-bootstrap/Spinner';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { useUser } from "../hooks/useUser";
+import { useUser } from "../../hooks/useUser";
 
 export default function GoogleBtn() {
     const [status, setStatus] = useState<"OK" | "Loading">("OK");

@@ -11,7 +11,16 @@
 //
 //
 // -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
+Cypress.Commands.add('login', () => {
+    cy.request("POST", "api/auth/registration",
+        {
+            code: "1000000000100000000010000000001000000000100000000010000000001000000000100"
+        })
+})
+
+Cypress.Commands.add('getByTestId', (id) => {
+    return cy.get(`[data-testid="${id}"]`)
+})
 //
 //
 // -- This is a child command --

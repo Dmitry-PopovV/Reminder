@@ -14,7 +14,7 @@ const port = Number(process.env.PORT);
 
 async function main() {
     try {
-        await serverInitialize();
+        const emailSendingJob = await serverInitialize();
 
         app
             .use(express.json())
@@ -22,12 +22,15 @@ async function main() {
             .use(express.static(__dirname + "/static"))
             .use("/api", Routers)
             .use(ErrorMidleware);
-        app
+
+        const server = app
             .listen(port, () => {
                 console.log(`App listening on port ${port}`);
             });
+
+        return { server, emailSendingJob };
     } catch (err) {
         console.log("Fatal error:\n", err);
     }
 }
-main();
+export const proceses = main();

@@ -7,4 +7,5 @@ export default function startEmailSendingJob() {
         onTick: sendEventEmail,
         start: true,
     });
+    return job;
 }

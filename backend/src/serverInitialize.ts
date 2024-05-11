@@ -6,7 +6,7 @@ export default async function serverInitialize() {
     try {
         await AppDataSource.initialize();
         await createDBFunctions();
-        startEmailSendingJob();
+        return startEmailSendingJob();
     } catch (err) {
         console.log("Server initializing error:\n", (err as Error).message);
         throw err;

@@ -4,7 +4,6 @@ import { useOutletContext } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
-import Alert from 'react-bootstrap/Alert';
 import format from 'date-fns/format';
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
 import differenceInCalendarWeeks from 'date-fns/differenceInCalendarWeeks';
@@ -21,6 +20,7 @@ import { Select } from "../Layout/Layout";
 import { useEvents } from '../../hooks/useEvents';
 import { RepetitiveEvent } from '../../store/slicers/eventsSlice';
 import { useScrollDown } from '../../hooks/useScrollDown';
+import AlertFlashingOnUpdate from "../AlertFlashingOnUpdate/AlertFlashingOnUpdate";
 
 function isEventOnThisDay(event: RepetitiveEvent, date: string) {
     const splitedDate = date.split('-');
@@ -90,6 +90,7 @@ export default function EventsList() {
                     variant='primary'
                     key={i}
                     onClick={onClick(oneTimeEvents[i].id)}
+                    data-time={format(new Date(oneTimeEvents[i].time), "HH:mm")}
                 >
                     {`${oneTimeEvents[i].title}: ${format(new Date(oneTimeEvents[i].time), "HH:mm")}`}
                 </Button>
@@ -102,11 +103,19 @@ export default function EventsList() {
                     variant='success'
                     key={i + "r"}
                     onClick={onClick(repetitiveEvents[i].id)}
+                    data-time={format(new Date(repetitiveEvents[i].time), "HH:mm")}
                 >
                     {`${repetitiveEvents[i].title}: ${format(new Date(repetitiveEvents[i].time), "HH:mm")}`}
                 </Button>
             )
         }
+        list.sort((a, b) => {
+            if (a.props["data-time"] < b.props["data-time"]) {
+                return -1;
+            } else {
+                return 1;
+            }
+        })
     }
 
 
@@ -118,9 +127,7 @@ export default function EventsList() {
     }
     return (
         <Container fluid className="mb-3">
-            <Alert variant="light" className="text-center">
-                {select.date}
-            </Alert>
+            <AlertFlashingOnUpdate text={select.date} />
             <Row xs={1} className='gy-2'>
                 <div className={style.list + " pb-3"}>
                     <Row className="gy-1">

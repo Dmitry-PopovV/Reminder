@@ -1,9 +1,11 @@
 import style from "./Calendar.module.scss"
+import "./CalendarPointer.scss"
 import { useRef } from 'react';
 import { Spinner } from 'react-bootstrap';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import differenceInDays from "date-fns/differenceInDays";
 import addMonths from 'date-fns/addMonths';
 import subMonths from 'date-fns/subMonths';
 import set from 'date-fns/set';
@@ -27,7 +29,7 @@ import getRepeatPeriod from '../../functions/getRepeatPeriod';
 
 const setParams = { milliseconds: 0, seconds: 0, minutes: 0, hours: 0, date: 0 };
 
-export default function Calendar({ setSelect }: { setSelect: (param: Select) => void }) {
+export default function Calendar({ select, setSelect }: { select: Select, setSelect: (param: Select) => void }) {
     const { events, loadedMonths, newMonths } = useEvents();
     const calendarRef = useRef<FullCalendar>() as React.MutableRefObject<FullCalendar>;
 
@@ -86,6 +88,8 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
     }
 
     function onEventClick(arg: any) {
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.select(arg.event.startStr);
         setSelect({
             view: "redactor",
             date: arg.event.startStr,
@@ -256,30 +260,35 @@ export default function Calendar({ setSelect }: { setSelect: (param: Select) => 
                 height="100%"
                 initialView="dayGridMonth"
                 eventSources={[{ events: (info, callBack) => { callBack(toCalendarEvents(events, info.start, info.end)) } }]}
+                selectable={true}
+                unselectAuto={false}
+                selectAllow={(info) => differenceInDays(new Date(info.endStr), new Date(info.startStr)) === 1}
                 dateClick={onDateClick}
                 eventClick={onEventClick}
                 customButtons={{
                     customNext: {
                         icon: 'chevron-right',
                         click: function () {
-                            let calendarApi = calendarRef.current.getApi();
+                            const calendarApi = calendarRef.current.getApi();
                             calendarApi.next();
+                            calendarApi.select(select.date);
                             updateMonths(calendarApi.getDate());
                         }
                     },
                     customPrev: {
                         icon: 'chevron-left',
                         click: function () {
-                            let calendarApi = calendarRef.current.getApi();
+                            const calendarApi = calendarRef.current.getApi();
                             calendarApi.prev();
+                            calendarApi.select(select.date);
                             updateMonths(calendarApi.getDate());
                         }
                     }
                 }}
                 headerToolbar={{
-                    start: 'title',
-                    center: '',
-                    end: 'customPrev,customNext'
+                    start: 'customPrev',
+                    center: 'title',
+                    end: 'customNext'
                 }}
             />
         </div>) : (

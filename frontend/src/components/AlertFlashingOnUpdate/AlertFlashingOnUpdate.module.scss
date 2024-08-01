@@ -1,0 +1,12 @@
+@keyframes color_change {
+    from {
+        background-color: lightgray;
+    }
+
+    to {}
+}
+
+.text {
+    animation-name: color_change;
+    animation-duration: 0.8s;
+}

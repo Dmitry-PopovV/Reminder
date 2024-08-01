@@ -1,3 +1,4 @@
+import style from "./EventsRedactor.module.scss";
 import { useRef } from 'react';
 import { Navigate } from 'react-router';
 import { useOutletContext } from "react-router-dom";
@@ -276,6 +277,7 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
                     deleteEvent(event.id);
                     newEvent(event);
                 }
+                onExit();
             });
     }
 
@@ -352,7 +354,7 @@ function Redactor({ select, setSelect }: { select: Select, setSelect: (param: Se
     return (
         <div>
             <InputGroup className="mb-3">
-                <Button onClick={onExit}>←</Button>
+                <Button className={style.exitButton} onClick={onExit} />
                 <Form.Control
                     id="title"
                     data-testid="titleInput"

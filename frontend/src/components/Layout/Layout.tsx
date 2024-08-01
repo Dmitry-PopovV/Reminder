@@ -30,10 +30,10 @@ export default function Layout() {
             <Container fluid className="mt-4 px-5">
                 <Row xs={1} md={2}>
                     <Col className="gy-1">
-                        <Calendar setSelect={setSelect} />
+                        <Calendar select={select} setSelect={setSelect} />
                     </Col>
                     <Col className="gy-1">
-                        <Outlet context={{select, setSelect}} />
+                        <Outlet context={{ select, setSelect }} />
                     </Col>
                 </Row>
             </Container>
